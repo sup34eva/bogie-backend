@@ -1,81 +1,47 @@
 import {
   GraphQLSchema,
   GraphQLObjectType,
-  GraphQLScalarType,
-  GraphQLList,
-  GraphQLID,
-  GraphQLString
+  GraphQLID
 } from 'graphql';
 
+import {
+    connectionArgs,
+    connectionFromPromisedArray
+} from 'graphql-relay';
+
+import {
+    nodeField
+} from './node';
+
 import Train from '../entities/train';
-import trainLoader from '../loaders/train';
-import stationLoader from '../loaders/station';
+import dateType from './types/date';
 
-const dateType = new GraphQLScalarType({
-    name: 'Date',
-    description: `Anything parseable as a JS Date object is accepted as input. The returned value will always be serialized as an ISO String.`,
-    serialize: value => value.toISOString(),
-    parseValue: value => new Date(value),
-    parseLiteral: ast => new Date(ast.value)
-});
-
-const stationType = new GraphQLObjectType({
-    name: 'Station',
-    description: 'A train station',
-    fields: {
-        id: {
-            type: GraphQLID,
-            resolve: ({_id}) => _id
-        },
-        name: {
-            type: GraphQLString
-        }
-    }
-});
-
-const trainType = new GraphQLObjectType({
-    name: 'Train',
-    description: 'A train travel',
-    fields: {
-        id: {
-            type: GraphQLID,
-            resolve: ({_id}) => _id
-        },
-        departure: {
-            type: stationType,
-            resolve: ({departure}) => stationLoader.load(departure)
-        },
-        arrival: {
-            type: stationType,
-            resolve: ({arrival}) => stationLoader.load(arrival)
-        },
-        date: {
-            type: dateType
-        }
-    }
-});
+import {
+    trainConnection
+} from './connections';
 
 export default new GraphQLSchema({
     query: new GraphQLObjectType({
         name: 'Query',
         fields: {
             trains: {
-                type: new GraphQLList(trainType),
-                args: {
+                type: trainConnection,
+                args: Object.assign({
                     departure: {
                         type: GraphQLID
                     },
                     arrival: {
                         type: GraphQLID
                     },
-                    before: {
+                    maxDate: {
                         type: dateType
                     },
-                    after: {
+                    minDate: {
                         type: dateType
                     }
-                },
-                resolve(src, {departure, arrival, before, after}) {
+                }, connectionArgs),
+                resolve(src, args) {
+                    const {departure, arrival, before, after} = args;
                     const query = Train.find();
 
                     if (departure) {
@@ -92,27 +58,10 @@ export default new GraphQLSchema({
                         query.where('date').gt(after);
                     }
 
-                    return query.exec();
+                    return connectionFromPromisedArray(query.exec(), args);
                 }
             },
-            train: {
-                type: trainType,
-                args: {
-                    id: {
-                        type: GraphQLID
-                    }
-                },
-                resolve: (src, {id}) => trainLoader.load(id)
-            },
-            station: {
-                type: stationType,
-                args: {
-                    id: {
-                        type: GraphQLID
-                    }
-                },
-                resolve: (src, {id}) => stationLoader.load(id)
-            }
+            node: nodeField
         }
     })
 });
