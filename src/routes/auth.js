@@ -1,13 +1,12 @@
 import oauth2orize from 'oauth2orize';
 import passport from 'passport';
 
+import user from '../loaders/user';
+import client from '../loaders/client';
+
 import {
     Router as createRouter
 } from 'express';
-import {
-    client,
-    user
-} from '../loaders';
 import {
     BasicStrategy
 } from 'passport-http';
