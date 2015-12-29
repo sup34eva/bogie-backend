@@ -7,7 +7,7 @@ var fs = require('fs'),
     utils = require('graphql/utilities');
 
 graphql.graphql(schema.default, utils.introspectionQuery).then(function (result) {
-    fs.writeFileSync(path.join(__dirname, '../../data/schema.json'), JSON.stringify(result, null, 2));
+    fs.writeFileSync(path.join(__dirname, '../../web/data/schema.json'), JSON.stringify(result, null, 2));
 }).catch(function (errors) {
     console.error('ERROR introspecting schema: ', JSON.stringify(errors, null, 2));
 });

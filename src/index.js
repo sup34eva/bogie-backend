@@ -5,6 +5,9 @@ import admin from 'sriracha-admin';
 import errorhandler from 'errorhandler';
 import debug from 'express-debug';
 import morgan from 'morgan';
+import {
+    json, urlencoded
+} from 'body-parser';
 
 import authRouter from './routes/auth';
 import graphRouter from './routes/graphql';
@@ -25,6 +28,11 @@ app.use((req, res, next) => {
         next();
     }
 });
+
+app.use(json());
+app.use(urlencoded({
+    extended: true
+}));
 
 app.use('/auth', authRouter);
 app.use('/graphql', graphRouter);

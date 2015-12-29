@@ -1,14 +1,14 @@
 import DataLoader from 'dataloader';
-import Train from '../entities/train';
+import AccessToken from '../entities/accessToken';
 
 import {
     sortResult
 } from '../utils/loaderHelpers';
 
 export default new DataLoader(keys =>
-    Train.find({
+    AccessToken.find({
         _id: {
             $in: keys
         }
-    }).exec().then(sortResult(keys, 'Train'))
+    }).exec().then(sortResult(keys, 'AccessToken'))
 );

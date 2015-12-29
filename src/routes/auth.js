@@ -3,6 +3,9 @@ import passport from 'passport';
 
 import user from '../loaders/user';
 import client from '../loaders/client';
+import accessToken from '../loaders/accessToken';
+
+import AccessToken from '../entities/accessToken';
 
 import {
     Router as createRouter
@@ -30,9 +33,15 @@ passport.use(new BasicStrategy(checkClient));
 passport.use(new ClientPasswordStrategy(checkClient));
 
 passport.use(new BearerStrategy((token, done) => {
-    // TODO: Check token
-
-    done(null, {}, {});
+    accessToken.load(token).then(token =>
+        user.load(token.user).then(user => {
+            done(null, user, {
+                scope: token.scope
+            });
+        })
+    ).catch(err => {
+        done(err);
+    });
 }));
 
 const server = oauth2orize.createServer();
@@ -53,9 +62,16 @@ server.exchange(oauth2orize.exchange.password((client, username, password, scope
             return done(null, false);
         }
 
-        // TODO: Create tokens
-
-        done(null, 'access', 'refresh', {});
+        AccessToken.create({
+            client: client.id,
+            user: username,
+            scope
+        }, (err, {_id}) => {
+            if (err) {
+                return done(err);
+            }
+            return done(null, _id);
+        });
     }).catch(err => {
         done(err);
     });

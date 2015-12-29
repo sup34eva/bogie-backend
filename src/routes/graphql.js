@@ -1,18 +1,17 @@
 import graphqlHTTP from 'express-graphql';
-// import passport from 'passport';
+import passport from 'passport';
 
 import schema from '../graph';
 
 export default [
-    /* passport.authenticate('bearer', {
+    passport.authenticate('bearer', {
         session: false
-    }),*/
+    }),
     graphqlHTTP(request => ({
         schema,
         rootValue: {
             request
         },
-        graphiql: true,
         pretty: true
     }))
 ];

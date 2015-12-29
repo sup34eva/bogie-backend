@@ -1,14 +1,14 @@
 import DataLoader from 'dataloader';
 import Client from '../entities/client';
 
+import {
+    sortResult
+} from '../utils/loaderHelpers';
+
 export default new DataLoader(keys =>
     Client.find({
         _id: {
             $in: keys
         }
-    }).exec().then(result =>
-        keys.map(key =>
-            result.find(({_id}) => _id.equals(key))
-        )
-    )
+    }).exec().then(sortResult(keys, 'Client'))
 );
