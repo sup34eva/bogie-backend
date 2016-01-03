@@ -1,9 +1,6 @@
 import 'babel-polyfill';
 import express from 'express';
 
-import admin from 'sriracha-admin';
-import errorhandler from 'errorhandler';
-import debug from 'express-debug';
 import morgan from 'morgan';
 import {
     json, urlencoded
@@ -14,9 +11,7 @@ import graphRouter from './routes/graphql';
 
 const app = express();
 
-if (process.env.NODE_ENV !== 'production') {
-    app.use(morgan('combined'));
-}
+app.use(morgan('combined'));
 
 app.use((req, res, next) => {
     res.set('Access-Control-Allow-Origin', '*');
@@ -38,19 +33,11 @@ app.use('/auth', authRouter);
 app.use('/graphql', graphRouter);
 
 if (process.env.NODE_ENV !== 'production') {
-    app.use('/db', admin({
-        Train: {
-            searchField: '_id'
-        },
-        Station: {
-            searchField: 'name'
-        }
-    }));
+    const errorhandler = require('errorhandler');
     app.use(errorhandler());
-    debug(app);
 }
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 8888;
 app.listen(PORT, () => {
     console.log(`Server listening on port ${PORT}`);
 });
