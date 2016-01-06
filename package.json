@@ -4,7 +4,7 @@
     "description": "The service provider for the Bogie infrastructure",
     "main": "dist/index.js",
     "scripts": {
-        "test": "echo \"Error: no test specified\" && exit 1",
+        "lint": "./node_modules/.bin/xo src/**/*.js",
         "prestart": "./node_modules/.bin/babel src --out-dir dist",
         "start": "node dist/index.js"
     },
@@ -36,7 +36,9 @@
         }
     },
     "devDependencies": {
-        "errorhandler": "^1.4.2"
+        "errorhandler": "^1.4.2",
+        "pre-commit": "^1.1.2",
+        "xo": "^0.12.1"
     },
     "dependencies": {
         "babel-cli": "^6.3.17",
@@ -60,5 +62,8 @@
         "pg": "^4.4.3",
         "pg-hstore": "^2.3.2",
         "sequelize": "^3.14.2"
-    }
+    },
+    "pre-commit": [
+        "lint"
+    ]
 }
