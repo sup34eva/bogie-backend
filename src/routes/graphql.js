@@ -2,40 +2,62 @@ import {
     graphql
 } from 'graphql';
 import graphqlHTTP from 'express-graphql';
-import passport from 'passport';
+import passport from 'koa-passport';
 
 import {
     introspectionQuery,
     printSchema
 } from 'graphql/utilities';
-import {
-    Router as createRouter
-} from 'express';
 
 import schema from '../graph';
 
-const router = createRouter();
-export default router;
+export const schemaJSON = async ctx => {
+    try {
+        const result = await graphql(schema, introspectionQuery);
+        ctx.body = result;
+    } catch (err) {
+        ctx.status = 500;
+        ctx.body = err;
+    }
+};
 
-router.get('/schema.json', (req, res) => {
-    graphql(schema, introspectionQuery).then(result => {
-        console.log(result);
-        res.json(result);
-    }).catch(errors => {
-        res.status(500).json(errors);
-    });
-});
+export const schemaQL = ctx => {
+    ctx.body = printSchema(schema);
+};
 
-router.get('/schema.graphql', (req, res) => {
-    res.end(printSchema(schema));
-});
+function fromExpress(middleware) {
+    return async ctx => {
+        try {
+            ctx.body = await new Promise(function (resolve, reject) {
+                middleware(ctx.request, {
+                    ...ctx.response,
+                    set(...args) {
+                        ctx.set(...args);
+                        return this;
+                    },
+                    status(code) {
+                        reject(code);
+                    },
+                    send(body) {
+                        resolve(body);
+                    }
+                });
+            });
+        } catch (code) {
+            ctx.status = code;
+        }
+    };
+}
 
-router.use('/', passport.authenticate('bearer', {
-    session: false
-}), graphqlHTTP(request => ({
-    schema,
-    rootValue: {
-        request
-    },
-    pretty: true
-})));
+export const endpoint = [
+    passport.authenticate('bearer', {
+        session: false
+    }),
+    fromExpress(graphqlHTTP(request => ({
+        schema,
+        rootValue: {
+            request
+        },
+        pretty: true
+    })))
+];

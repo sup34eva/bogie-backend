@@ -1,41 +1,33 @@
 import 'babel-polyfill';
-import express from 'express';
+import Koa from 'koa';
 
-import morgan from 'morgan';
+import morgan from 'koa-morgan';
+import bodyParser from 'koa-bodyparser';
+import passport from 'koa-passport';
+import Router from 'koa-router';
+
+import auth from './routes/auth';
 import {
-    json, urlencoded
-} from 'body-parser';
+    schemaJSON,
+    schemaQL,
+    endpoint
+} from './routes/graphql';
 
-import authRouter from './routes/auth';
-import graphRouter from './routes/graphql';
-
-const app = express();
+const app = new Koa();
+const router = new Router();
 
 app.use(morgan('combined'));
+app.use(bodyParser());
 
-app.use((req, res, next) => {
-    res.set('Access-Control-Allow-Origin', '*');
-    res.set('Access-Control-Allow-Headers', 'Content-Type');
+app.use(passport.initialize());
 
-    if (req.method === 'OPTIONS') {
-        res.sendStatus(200);
-    } else {
-        next();
-    }
-});
+router.post('/graphql', ...endpoint);
+router.post('/token', ...auth);
+router.get('/schema.graphql', schemaQL);
+router.get('/schema.json', schemaJSON);
 
-app.use(json());
-app.use(urlencoded({
-    extended: true
-}));
-
-app.use('/auth', authRouter);
-app.use('/graphql', graphRouter);
-
-if (process.env.NODE_ENV !== 'production') {
-    const errorhandler = require('errorhandler');
-    app.use(errorhandler());
-}
+app.use(router.routes());
+app.use(router.allowedMethods());
 
 const PORT = process.env.PORT || 8888;
 app.listen(PORT, () => {

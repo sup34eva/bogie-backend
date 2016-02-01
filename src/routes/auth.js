@@ -1,15 +1,12 @@
-import oauth2orize from 'oauth2orize';
-import passport from 'passport';
+import oauth2orize from 'oauth2orize-koa';
+import passport from 'koa-passport';
 
-import user from '../loaders/user';
+import userLoader from '../loaders/user';
 import client from '../loaders/client';
 import accessToken from '../loaders/accessToken';
 
 import AccessToken from '../entities/accessToken';
 
-import {
-    Router as createRouter
-} from 'express';
 import {
     BasicStrategy
 } from 'passport-http';
@@ -34,7 +31,7 @@ passport.use(new ClientPasswordStrategy(checkClient));
 
 passport.use(new BearerStrategy((token, done) => {
     accessToken.load(token).then(token =>
-        user.load(token.user).then(user => {
+        userLoader.load(token.user).then(user => {
             done(null, user, {
                 scope: token.scope
             });
@@ -56,34 +53,26 @@ server.deserializeClient((id, done) => {
     });
 });
 
-server.exchange(oauth2orize.exchange.password((client, username, password, scope, done) => {
-    user.load(username).then(client => {
-        if (client.password !== password) {
-            return done(null, false);
-        }
+server.exchange(oauth2orize.exchange.password(async (client, username, password, scope) => {
+    const user = await userLoader.load(username);
 
-        AccessToken.create({
-            client: client.id,
-            user: username,
-            scope
-        }, (err, {_id}) => {
-            if (err) {
-                return done(err);
-            }
-            return done(null, _id);
-        });
-    }).catch(err => {
-        done(err);
+    if (user.password !== password) {
+        return false;
+    }
+
+    const {_id: token} = await AccessToken.create({
+        client: user._id,
+        user: username,
+        scope
     });
+
+    return token;
 }));
 
-const router = createRouter();
-export default router;
-
-router.post('/token',
+export default [
     passport.authenticate(['basic', 'oauth2-client-password'], {
         session: false
     }),
     server.token(),
     server.errorHandler()
-);
+];
