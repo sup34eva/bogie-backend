@@ -6,7 +6,8 @@ import db from './db';
 export const schema = new Schema({
     user: Schema.Types.ObjectId,
     client: Schema.Types.ObjectId,
-    scope: String
+    scope: String,
+    createdAt: Date
 });
 
 export default db.model('AccessToken', schema);

@@ -3,15 +3,13 @@ import Koa from 'koa';
 
 import morgan from 'koa-morgan';
 import bodyParser from 'koa-bodyparser';
-import passport from 'koa-passport';
 import Router from 'koa-router';
 
-import auth from './routes/auth';
 import {
     schemaJSON,
     schemaQL,
     endpoint
-} from './routes/graphql';
+} from './graphql';
 
 const app = new Koa();
 const router = new Router();
@@ -19,10 +17,8 @@ const router = new Router();
 app.use(morgan('combined'));
 app.use(bodyParser());
 
-app.use(passport.initialize());
-
-router.post('/graphql', ...endpoint);
-router.post('/token', ...auth);
+router.get('/graphql', endpoint);
+router.post('/graphql', endpoint);
 router.get('/schema.graphql', schemaQL);
 router.get('/schema.json', schemaJSON);
 

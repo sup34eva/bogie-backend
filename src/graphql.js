@@ -2,14 +2,13 @@ import {
     graphql
 } from 'graphql';
 import graphqlHTTP from 'express-graphql';
-import passport from 'koa-passport';
 
 import {
     introspectionQuery,
     printSchema
 } from 'graphql/utilities';
 
-import schema from '../graph';
+import schema from './graph';
 
 export const schemaJSON = async ctx => {
     try {
@@ -49,15 +48,13 @@ function fromExpress(middleware) {
     };
 }
 
-export const endpoint = [
-    passport.authenticate('bearer', {
-        session: false
-    }),
-    fromExpress(graphqlHTTP(request => ({
+export const endpoint = fromExpress(
+    graphqlHTTP(request => ({
         schema,
         rootValue: {
             request
         },
-        pretty: true
-    })))
-];
+        pretty: true,
+        graphiql: true
+    }))
+);
