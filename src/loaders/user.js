@@ -1,14 +1,14 @@
 import DataLoader from 'dataloader';
 import User from '../entities/user';
 
+import {
+    sortResult
+} from '../utils/loaderHelpers';
+
 export default new DataLoader(keys =>
     User.find({
-        username: {
+        _id: {
             $in: keys
         }
-    }).exec().then(result =>
-        keys.map(key =>
-            result.find(({username}) => username === key) || new Error(`User not found: ${key}`)
-        )
-    )
+    }).exec().then(sortResult(keys, 'User'))
 );

@@ -10,7 +10,7 @@ import {
     compare
 } from 'bcrypt-nodejs';
 
-import userLoader from '../../loaders/user';
+import usernameLoader from '../../loaders/username';
 import clientLoader from '../../loaders/client';
 
 import AccessToken from '../../entities/accessToken';
@@ -65,7 +65,7 @@ export default mutationWithClientMutationId({
             throw new Error('Wrong client secret');
         }
 
-        const user = await userLoader.load(username);
+        const user = await usernameLoader.load(username);
         const equals = await compareAsync(password, user.password);
         if (!equals) {
             throw new Error('Wrong password');
