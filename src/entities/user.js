@@ -4,7 +4,14 @@ import {
 import db from './db';
 
 export const schema = new Schema({
-    password: String
+    username: {
+        type: String,
+        index: {
+            unique: true
+        }
+    },
+    password: String,
+    createdAt: Date
 });
 
 export default db.model('User', schema);

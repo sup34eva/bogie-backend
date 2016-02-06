@@ -9,11 +9,13 @@ import {
 
 import userLoader from '../../loaders/user';
 import clientLoader from '../../loaders/client';
+import tokenLoader from '../../loaders/refreshToken';
 
 import AccessToken from '../../entities/accessToken';
 
 export default mutationWithClientMutationId({
-    name: 'Exchange',
+    name: 'GrantRefreshToken',
+    description: 'Allows an authenticated client to get a new access token with an existing refresh token',
     inputFields: {
         clientId: {
             type: new GraphQLNonNull(GraphQLString)
@@ -21,44 +23,46 @@ export default mutationWithClientMutationId({
         clientSecret: {
             type: new GraphQLNonNull(GraphQLString)
         },
-        username: {
-            type: new GraphQLNonNull(GraphQLString)
-        },
-        password: {
-            type: new GraphQLNonNull(GraphQLString)
-        },
-        scope: {
+        refreshToken: {
             type: new GraphQLNonNull(GraphQLString)
         }
     },
     outputFields: {
-        token: {
+        accessToken: {
+            type: GraphQLString
+        },
+        refreshToken: {
             type: GraphQLString
         },
         expires: {
             type: GraphQLInt
         }
     },
-    async mutateAndGetPayload({clientId, clientSecret, username, password, scope}) {
-        const client = await clientLoader.load(clientId);
+    async mutateAndGetPayload({clientId, clientSecret, refreshToken}) {
+        const [client, token] = await Promise.all([
+            clientLoader.load(clientId),
+            tokenLoader.load(refreshToken)
+        ]);
+
         if (client.secret !== clientSecret) {
             throw new Error('Wrong client secret');
         }
 
-        const user = await userLoader.load(username);
-        if (user.password !== password) {
-            throw new Error('Wrong password');
+        if (token.client !== clientId) {
+            throw new Error('This refresh token was not issued to this client');
         }
 
-        const {_id: token} = await AccessToken.create({
+        const user = await userLoader.load(token.user);
+        const {_id: accessToken} = await AccessToken.create({
             client: client._id,
             user: user._id,
             createdAt: new Date(),
-            scope
+            scope: token.scope
         });
 
         return {
-            token,
+            accessToken,
+            refreshToken,
             expires: 3600
         };
     }

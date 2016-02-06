@@ -8,7 +8,9 @@ import {
 } from './node';
 
 import viewerField from './types/viewer';
-import exchangeMutation from './mutations/exchange';
+import grantPassword from './mutations/grantPassword';
+import refreshToken from './mutations/refreshToken';
+import register from './mutations/register';
 
 export default new GraphQLSchema({
     query: new GraphQLObjectType({
@@ -21,7 +23,9 @@ export default new GraphQLSchema({
     mutation: new GraphQLObjectType({
         name: 'Mutation',
         fields: {
-            exchange: exchangeMutation
+            grantPassword,
+            refreshToken,
+            register
         }
     })
 });
