@@ -3,14 +3,14 @@ import {
     GraphQLString
 } from 'graphql';
 import {
-    mutationWithClientMutationId,
-    toGlobalId
+    mutationWithClientMutationId
 } from 'graphql-relay';
 import {
     hash
 } from 'bcrypt-nodejs';
 
 import User from '../../entities/user';
+import userType from '../types/user';
 
 function hashAsync(data, salt, progress) {
     return new Promise((resolve, reject) => {
@@ -36,21 +36,20 @@ export default mutationWithClientMutationId({
         }
     },
     outputFields: {
-        id: {
-            type: GraphQLString
+        user: {
+            type: userType
         }
     },
     async mutateAndGetPayload({username, password}) {
         const encryptedPass = await hashAsync(password);
-        await User.create({
+        const user = await User.create({
             username,
             password: encryptedPass,
             createdAt: new Date()
         });
 
         return {
-            id: toGlobalId('User', username),
-            expires: 3600
+            user
         };
     }
 });

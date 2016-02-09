@@ -14,7 +14,7 @@ import {
 const app = new Koa();
 const router = new Router();
 
-app.use(morgan('combined'));
+app.use(morgan(':method :url :status'));
 app.use(bodyParser());
 
 router.get('/graphql', endpoint);
