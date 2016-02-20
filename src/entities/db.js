@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 
 mongoose.Promise = Promise;
 
-mongoose.connect('mongodb://localhost/test', {
+mongoose.connect(process.env.DATABASE_URL, {
     server: {
         poolSize: 4
     }

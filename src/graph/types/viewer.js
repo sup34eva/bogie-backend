@@ -8,12 +8,12 @@ import {
     connectionArgs,
     connectionFromPromisedArray
 } from 'graphql-relay';
+import jwt from 'jsonwebtoken';
 
 import Train from '../../entities/train';
 import dateType from './date';
 import userType from './user';
 
-import tokenLoader from '../../loaders/accessToken';
 import userLoader from '../../loaders/user';
 import clientLoader from '../../loaders/client';
 
@@ -82,10 +82,10 @@ export default {
         }
 
         const {
-            user: userId,
-            client: clientId,
+            sub: userId,
+            aud: clientId,
             scope
-        } = await tokenLoader.load(token);
+        } = jwt.verify(token, process.env.TOKEN_SECRET);
         const user = await userLoader.load(userId);
         const client = await clientLoader.load(clientId);
 

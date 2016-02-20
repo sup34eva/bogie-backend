@@ -1,7 +1,6 @@
 import {
     GraphQLNonNull,
-    GraphQLString,
-    GraphQLInt
+    GraphQLString
 } from 'graphql';
 import {
     mutationWithClientMutationId
@@ -9,12 +8,10 @@ import {
 import {
     compare
 } from 'bcrypt-nodejs';
+import jwt from 'jsonwebtoken';
 
 import usernameLoader from '../../loaders/username';
 import clientLoader from '../../loaders/client';
-
-import AccessToken from '../../entities/accessToken';
-import RefreshToken from '../../entities/refreshToken';
 
 function compareAsync(data, encrypted) {
     return new Promise((resolve, reject) => {
@@ -49,14 +46,8 @@ export default mutationWithClientMutationId({
         }
     },
     outputFields: {
-        accessToken: {
+        token: {
             type: GraphQLString
-        },
-        refreshToken: {
-            type: GraphQLString
-        },
-        expires: {
-            type: GraphQLInt
         }
     },
     async mutateAndGetPayload({clientId, clientSecret, username, password, scope}) {
@@ -71,28 +62,14 @@ export default mutationWithClientMutationId({
             throw new Error('Wrong password');
         }
 
-        const [
-            {_id: accessToken},
-            {_id: refreshToken}
-        ] = await Promise.all([
-            AccessToken.create({
-                client: client._id,
-                user: user._id,
-                createdAt: new Date(),
-                scope
-            }),
-            RefreshToken.create({
-                client: client._id,
-                user: user._id,
-                createdAt: new Date(),
-                scope
-            })
-        ]);
+        const token = jwt.sign({
+            sub: user._id,
+            aud: client._id,
+            scope
+        }, process.env.TOKEN_SECRET);
 
         return {
-            accessToken,
-            refreshToken,
-            expires: 3600
+            token
         };
     }
 });

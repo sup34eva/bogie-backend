@@ -55,6 +55,7 @@
         "express-graphql": "^0.4.5",
         "graphql": "^0.4.14",
         "graphql-relay": "^0.3.6",
+        "jsonwebtoken": "^5.7.0",
         "koa": "^2.0.0-alpha.3",
         "koa-bodyparser": "^3.0.0",
         "koa-morgan": "^1.0.1",
