@@ -1,5 +1,6 @@
 import {
-  GraphQLObjectType
+    GraphQLObjectType,
+    GraphQLString
 } from 'graphql';
 import {
     globalIdField
@@ -12,7 +13,10 @@ export default new GraphQLObjectType({
     name: 'User',
     description: 'A generic user of the service',
     fields: {
-        id: globalIdField('User', user => user._id)
+        id: globalIdField('User'),
+        username: {
+            type: GraphQLString
+        }
     },
     interfaces: [nodeInterface]
 });

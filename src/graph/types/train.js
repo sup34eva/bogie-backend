@@ -16,7 +16,7 @@ export default new GraphQLObjectType({
     name: 'Train',
     description: 'A train travel',
     fields: {
-        id: globalIdField('Train', train => train._id),
+        id: globalIdField('Train'),
         departure: {
             type: stationType,
             resolve: ({departure}) => stationLoader.load(departure)
