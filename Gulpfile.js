@@ -32,6 +32,8 @@ gulp.task('default', ['build'], () => {
         tasks: ['build'],
         env: {
             NODE_ENV: 'development',
+            DATABASE_HOST: 'localhost',
+            DATABASE_PORT: 28015,
             PORT: 8888
         }
     });

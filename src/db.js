@@ -4,8 +4,8 @@ export default rethinkdbdash({
     db: 'test',
     servers: [
         {
-            host: 'localhost',
-            port: 28015
+            host: process.env.DATABASE_HOST,
+            port: process.env.DATABASE_PORT
         }
     ]
 });
