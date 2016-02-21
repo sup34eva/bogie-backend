@@ -9,7 +9,6 @@ import {
 
 import viewerField from './types/viewer';
 import grantPassword from './mutations/grantPassword';
-import refreshToken from './mutations/refreshToken';
 import register from './mutations/register';
 
 export default new GraphQLSchema({
@@ -24,7 +23,6 @@ export default new GraphQLSchema({
         name: 'Mutation',
         fields: {
             grantPassword,
-            refreshToken,
             register
         }
     })
