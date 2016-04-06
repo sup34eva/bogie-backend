@@ -1,14 +1,6 @@
 import DataLoader from 'dataloader';
-import Train from '../entities/train';
-
-import {
-    sortResult
-} from '../utils/loaderHelpers';
+import r from '../db';
 
 export default new DataLoader(keys =>
-    Train.find({
-        _id: {
-            $in: keys
-        }
-    }).exec().then(sortResult(keys, 'Train'))
+    r.expr(keys).map(key => r.table('trains').get(key))
 );

@@ -1,25 +1,20 @@
 import {
-  GraphQLObjectType,
-  GraphQLString,
-  GraphQLID
+    GraphQLObjectType,
+    GraphQLString,
+    GraphQLNonNull
 } from 'graphql';
 
-import {
-    connectionArgs,
-    connectionFromPromisedArray
-} from 'graphql-relay';
 import jwt from 'jsonwebtoken';
 
-import Train from '../../entities/train';
-import dateType from './date';
 import userType from './user';
+import stationType from './station';
 
 import userLoader from '../../loaders/user';
+import usernameLoader from '../../loaders/username';
 import clientLoader from '../../loaders/client';
+import stationNameLoader from '../../loaders/stationName';
 
-import {
-    trainConnection
-} from '../connections';
+import trainSearch from '../trainSearch';
 
 const Viewer = new GraphQLObjectType({
     name: 'Viewer',
@@ -29,41 +24,27 @@ const Viewer = new GraphQLObjectType({
             type: userType,
             resolve: ({user}) => user
         },
-        trains: {
-            type: trainConnection,
-            args: Object.assign({
-                departure: {
-                    type: GraphQLID
-                },
-                arrival: {
-                    type: GraphQLID
-                },
-                maxDate: {
-                    type: dateType
-                },
-                minDate: {
-                    type: dateType
+        trains: trainSearch,
+        user: {
+            type: userType,
+            args: {
+                name: {
+                    type: new GraphQLNonNull(GraphQLString)
                 }
-            }, connectionArgs),
-            resolve(src, args) {
-                const {departure, arrival, before, after} = args;
-                const query = Train.find();
-
-                if (departure) {
-                    query.where('departure').equals(departure);
+            },
+            resolve(src, {name}) {
+                return usernameLoader.load(name);
+            }
+        },
+        station: {
+            type: stationType,
+            args: {
+                name: {
+                    type: new GraphQLNonNull(GraphQLString)
                 }
-                if (arrival) {
-                    query.where('arrival').equals(arrival);
-                }
-
-                if (before) {
-                    query.where('date').lt(before);
-                }
-                if (after) {
-                    query.where('date').gt(after);
-                }
-
-                return connectionFromPromisedArray(query.exec(), args);
+            },
+            resolve(src, {name}) {
+                return stationNameLoader.load(name);
             }
         }
     }

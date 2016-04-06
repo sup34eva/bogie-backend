@@ -1,14 +1,7 @@
 import DataLoader from 'dataloader';
-import User from '../entities/user';
+import r from '../db';
+import userLoader from './user';
 
 export default new DataLoader(keys =>
-    User.find({
-        username: {
-            $in: keys
-        }
-    }).exec().then(result =>
-        keys.map(key =>
-            result.find(({username}) => username === key) || new Error(`User not found: ${key}`)
-        )
-    )
+    userLoader.loadMany(keys.map(key => r.uuid(key)))
 );

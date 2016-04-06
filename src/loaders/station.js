@@ -1,14 +1,6 @@
 import DataLoader from 'dataloader';
-import Station from '../entities/station';
-
-import {
-    sortResult
-} from '../utils/loaderHelpers';
+import r from '../db';
 
 export default new DataLoader(keys =>
-    Station.find({
-        _id: {
-            $in: keys
-        }
-    }).exec().then(sortResult(keys, 'Station'))
+    r.expr(keys).map(key => r.table('stations').get(key))
 );

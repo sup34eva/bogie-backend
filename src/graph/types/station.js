@@ -13,7 +13,7 @@ export default new GraphQLObjectType({
     name: 'Station',
     description: 'A train station',
     fields: {
-        id: globalIdField('Station', station => station._id),
+        id: globalIdField('Station'),
         name: {
             type: GraphQLString
         }

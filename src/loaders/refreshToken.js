@@ -2,5 +2,5 @@ import DataLoader from 'dataloader';
 import r from '../db';
 
 export default new DataLoader(keys =>
-    r.expr(keys).map(key => r.table('clients').get(key))
+    r.expr(keys).map(key => r.table('refreshTokens').get(key))
 );

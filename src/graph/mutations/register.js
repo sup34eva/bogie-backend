@@ -9,7 +9,7 @@ import {
     hash
 } from 'bcrypt-nodejs';
 
-import User from '../../entities/user';
+import r from '../../db';
 import userType from '../types/user';
 
 function hashAsync(data, salt, progress) {
@@ -42,14 +42,17 @@ export default mutationWithClientMutationId({
     },
     async mutateAndGetPayload({username, password}) {
         const encryptedPass = await hashAsync(password);
-        const user = await User.create({
+        const {generated_keys: [id]} = await r.table('users').insert({
+            id: r.uuid(username),
             username,
             password: encryptedPass,
-            createdAt: new Date()
+            createdAt: r.now()
         });
 
         return {
-            user
+            user: {
+                id
+            }
         };
     }
 });

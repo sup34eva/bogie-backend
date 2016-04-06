@@ -3,10 +3,9 @@ import {
     nodeDefinitions
 } from 'graphql-relay';
 
-import Train from '../entities/train';
-import Station from '../entities/station';
 import trainLoader from '../loaders/train';
 import stationLoader from '../loaders/station';
+import userLoader from '../loaders/user';
 
 export const {nodeInterface, nodeField} = nodeDefinitions(
     globalId => {
@@ -17,15 +16,24 @@ export const {nodeInterface, nodeField} = nodeDefinitions(
         if (type === 'Station') {
             return stationLoader.load(id);
         }
+        if (type === 'User') {
+            return userLoader.load(id);
+        }
         return null;
     },
     obj => {
-        if (obj instanceof Train) {
+        if (obj.departure) {
             return require('./types/train').default;
         }
-        if (obj instanceof Station) {
+
+        if (obj.lines) {
             return require('./types/station').default;
         }
+
+        if (obj.password) {
+            return require('./types/user').default;
+        }
+
         return null;
     }
 );
