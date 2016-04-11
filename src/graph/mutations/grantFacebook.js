@@ -9,22 +9,29 @@ import jwt from 'jsonwebtoken';
 import fetch from 'isomorphic-fetch';
 
 import r from '../../db';
-import usernameLoader from '../../loaders/username';
 import clientLoader from '../../loaders/client';
 
 async function findOrCreateUser({id, name}) {
     try {
-        const user = await usernameLoader.load(name);
+        const [user] = await r.table('users').filter({
+            fbId: id
+        });
+
         return user.id;
     } catch (e) {
-        r.table('users').insert({
-            id: r.uuid(name),
+        const sub = r.uuid(name);
+        const {inserted} = await r.table('users').insert({
+            id: sub,
             username: name,
             fbId: id,
             createdAt: r.now()
         });
 
-        return id;
+        if (inserted !== 1) {
+            throw new Error('Could not create user');
+        }
+
+        return sub;
     }
 }
 
