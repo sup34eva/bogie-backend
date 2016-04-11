@@ -3,11 +3,12 @@ import {
     GraphQLString,
     GraphQLNonNull
 } from 'graphql';
+import {
+    connectionArgs,
+    connectionFromPromisedArray
+} from 'graphql-relay';
 
 import jwt from 'jsonwebtoken';
-
-import userType from './user';
-import stationType from './station';
 
 import userLoader from '../../loaders/user';
 import usernameLoader from '../../loaders/username';
@@ -15,16 +16,24 @@ import clientLoader from '../../loaders/client';
 import stationNameLoader from '../../loaders/stationName';
 
 import trainSearch from '../trainSearch';
+import r from '../../db';
+
+import userType from './user';
+import stationType from './station';
+import lineType from './line';
 
 const Viewer = new GraphQLObjectType({
     name: 'Viewer',
     description: 'A holder type to access other data',
-    fields: {
+    fields: () => ({
+        // Trains
+        trains: trainSearch,
+
+        // Users
         me: {
             type: userType,
             resolve: ({user}) => user
         },
-        trains: trainSearch,
         user: {
             type: userType,
             args: {
@@ -34,6 +43,18 @@ const Viewer = new GraphQLObjectType({
             },
             resolve(src, {name}) {
                 return usernameLoader.load(name);
+            }
+        },
+
+        // Stations
+        stations: {
+            type: require('../connections').stationConnection,
+            args: connectionArgs,
+            resolve(station, args) {
+                return connectionFromPromisedArray(
+                    r.table('stations').run(),
+                    args
+                );
             }
         },
         station: {
@@ -46,8 +67,33 @@ const Viewer = new GraphQLObjectType({
             resolve(src, {name}) {
                 return stationNameLoader.load(name);
             }
+        },
+
+        // Lines
+        lines: {
+            type: require('../connections').lineConnection,
+            args: connectionArgs,
+            resolve(station, args) {
+                return connectionFromPromisedArray(
+                    r.table('stations').concatMap(
+                        r.row('lines')
+                    ).distinct().map(id => ({id})).run(),
+                    args
+                );
+            }
+        },
+        line: {
+            type: lineType,
+            args: {
+                id: {
+                    type: new GraphQLNonNull(GraphQLString)
+                }
+            },
+            resolve(src, args) {
+                return args;
+            }
         }
-    }
+    })
 });
 
 export default {

@@ -19,9 +19,14 @@ export const {nodeInterface, nodeField} = nodeDefinitions(
         if (type === 'User') {
             return userLoader.load(id);
         }
+        if (type === 'Line') {
+            return {id};
+        }
         return null;
     },
     obj => {
+        console.log(obj);
+
         if (obj.departure) {
             return require('./types/train').default;
         }
@@ -32,6 +37,10 @@ export const {nodeInterface, nodeField} = nodeDefinitions(
 
         if (obj.password) {
             return require('./types/user').default;
+        }
+
+        if (obj.id) {
+            return require('./types/line').default;
         }
 
         return null;
