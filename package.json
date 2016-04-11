@@ -5,7 +5,6 @@
     "main": "dist/index.js",
     "scripts": {
         "lint": "./node_modules/.bin/xo src/**/*.js",
-        "prestart": "./node_modules/.bin/babel src --out-dir dist",
         "start": "node dist/index.js"
     },
     "repository": {
@@ -59,6 +58,7 @@
         "express-graphql": "^0.4.5",
         "graphql": "^0.4.14",
         "graphql-relay": "^0.3.6",
+        "isomorphic-fetch": "^2.2.1",
         "jsonwebtoken": "^5.7.0",
         "koa": "^2.0.0-alpha.3",
         "koa-bodyparser": "^3.0.0",

@@ -9,6 +9,7 @@ import {
 
 import viewerField from './types/viewer';
 import grantPassword from './mutations/grantPassword';
+import grantFacebook from './mutations/grantFacebook';
 import register from './mutations/register';
 
 export default new GraphQLSchema({
@@ -22,6 +23,7 @@ export default new GraphQLSchema({
     mutation: new GraphQLObjectType({
         name: 'Mutation',
         fields: {
+            grantFacebook,
             grantPassword,
             register
         }
