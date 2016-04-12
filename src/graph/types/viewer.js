@@ -20,7 +20,6 @@ import r from '../../db';
 
 import userType from './user';
 import stationType from './station';
-import lineType from './line';
 
 const Viewer = new GraphQLObjectType({
     name: 'Viewer',
@@ -80,17 +79,6 @@ const Viewer = new GraphQLObjectType({
                     ).distinct().map(id => ({id})).run(),
                     args
                 );
-            }
-        },
-        line: {
-            type: lineType,
-            args: {
-                id: {
-                    type: new GraphQLNonNull(GraphQLString)
-                }
-            },
-            resolve(src, args) {
-                return args;
             }
         }
     })

@@ -35,13 +35,13 @@ export default new GraphQLObjectType({
         },
         latitude: {
             type: GraphQLFloat,
-            resolve({location: {coordinates: [latitude]}}) {
+            resolve({location: {coordinates: [, latitude]}}) {
                 return latitude;
             }
         },
         longitude: {
             type: GraphQLFloat,
-            resolve({location: {coordinates: [, longitude]}}) {
+            resolve({location: {coordinates: [longitude]}}) {
                 return longitude;
             }
         }

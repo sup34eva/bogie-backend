@@ -3,8 +3,14 @@ import {
     GraphQLString
 } from 'graphql';
 import {
-    globalIdField
+    globalIdField,
+    connectionArgs,
+    connectionFromArray,
+    connectionFromPromisedArray
 } from 'graphql-relay';
+
+import trainLoader from '../../loaders/train';
+
 import {
     nodeInterface
 } from '../node';
@@ -16,6 +22,20 @@ export default new GraphQLObjectType({
         id: globalIdField('User'),
         username: {
             type: GraphQLString
+        },
+        history: {
+            type: require('../connections').trainConnection,
+            args: connectionArgs,
+            resolve(line, args) {
+                if (line.history) {
+                    return connectionFromPromisedArray(
+                        trainLoader.loadMany(line.history),
+                        args
+                    );
+                }
+
+                return connectionFromArray([], args);
+            }
         }
     },
     interfaces: [nodeInterface]
