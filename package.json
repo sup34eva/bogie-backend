@@ -44,6 +44,7 @@
         "xo": "^0.12.1"
     },
     "dependencies": {
+        "auto-sni": "^1.0.3",
         "babel-cli": "^6.3.17",
         "babel-plugin-syntax-async-functions": "^6.3.13",
         "babel-plugin-transform-es2015-destructuring": "^6.4.0",

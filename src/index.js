@@ -1,5 +1,6 @@
 import 'babel-polyfill';
 import Koa from 'koa';
+import createServer from 'auto-sni';
 
 import morgan from 'koa-morgan';
 import bodyParser from 'koa-bodyparser';
@@ -26,6 +27,25 @@ app.use(router.routes());
 app.use(router.allowedMethods());
 
 const PORT = process.env.PORT || 8888;
-app.listen(PORT, () => {
-    console.log(`Server listening on port ${PORT}`);
-});
+const SECURE_PORT = process.env.SECURE_PORT || 8443;
+if (process.env.NODE_ENV === 'production') {
+    const server = createServer({
+        email: 'bogie@leops.me',
+        agreeTos: true,
+        debug: false,
+        domains: ['api.bogie.leops.me'],
+        forceSSL: false,
+        ports: {
+            http: PORT,
+            https: SECURE_PORT
+        }
+    }, app.callback());
+
+    server.once('listening', () => {
+        console.log(`HTTPS Server listening on port ${SECURE_PORT} with HTTP on port ${PORT}`);
+    });
+} else {
+    app.listen(PORT, () => {
+        console.log(`Server listening on port ${PORT}`);
+    });
+}

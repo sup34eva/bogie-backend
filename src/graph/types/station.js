@@ -26,9 +26,7 @@ export default new GraphQLObjectType({
             args: connectionArgs,
             resolve(station, args) {
                 return connectionFromArray(
-                    station.lines.map(lineId => ({
-                        id: lineId
-                    })),
+                    station.lines.map(id => ({id})),
                     args
                 );
             }
