@@ -17,6 +17,18 @@ const router = new Router();
 
 app.use(morgan(':method :url :status'));
 app.use(bodyParser());
+app.use(async (ctx, next) => {
+    ctx.set('Access-Control-Allow-Origin', '*');
+    ctx.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+    ctx.set('Access-Control-Allow-Headers', 'Content-Type');
+
+    if (ctx.method === 'OPTIONS') {
+        ctx.status = 200;
+        return;
+    }
+
+    await next();
+});
 
 router.get('/graphql', endpoint);
 router.post('/graphql', endpoint);
