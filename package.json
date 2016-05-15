@@ -45,7 +45,7 @@
     },
     "dependencies": {
         "auto-sni": "^1.0.3",
-        "babel-cli": "^6.3.17",
+        "babel-cli": "^6.8.0",
         "babel-plugin-syntax-async-functions": "^6.3.13",
         "babel-plugin-transform-es2015-destructuring": "^6.4.0",
         "babel-plugin-transform-es2015-modules-commonjs": "^6.4.5",
@@ -56,8 +56,8 @@
         "babel-polyfill": "^6.3.14",
         "bcrypt-nodejs": "0.0.3",
         "dataloader": "^1.0.0",
-        "express-graphql": "^0.4.5",
-        "graphql": "^0.4.14",
+        "express-graphql": "^0.5.1",
+        "graphql": "^0.6.0",
         "graphql-relay": "^0.3.6",
         "isomorphic-fetch": "^2.2.1",
         "jsonwebtoken": "^5.7.0",
@@ -66,7 +66,7 @@
         "koa-morgan": "^1.0.1",
         "koa-router": "^7.0.1",
         "node-dijkstra": "^2.2.1",
-        "rethinkdbdash": "^2.2.17"
+        "rethinkdbdash": "^2.3.6"
     },
     "pre-commit": [
         "lint"

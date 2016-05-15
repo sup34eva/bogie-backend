@@ -42,17 +42,24 @@ export default mutationWithClientMutationId({
     },
     async mutateAndGetPayload({username, password}) {
         const encryptedPass = await hashAsync(password);
-        const {generated_keys: [id]} = await r.table('users').insert({
-            id: r.uuid(username),
+        const id = r.uuid(username);
+        const data = await r.table('users').insert({
+            id,
             username,
             password: encryptedPass,
             createdAt: r.now()
         });
 
-        return {
-            user: {
-                id
-            }
-        };
+        if(data.errors) {
+            throw new Error(data.first_error);
+        }
+
+        if (data.inserted !== 1) {
+            throw new Error('Could not create user');
+        }
+
+        return r.table('users').get(id).then(user => ({
+            user
+        }));
     }
 });
