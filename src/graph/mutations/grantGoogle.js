@@ -46,11 +46,12 @@ export default mutationWithClientMutationId({
         }
 
         const {sub: googleId, email, name} = await res.json();
+        const username = name || email;
         const sub = await findOrCreateUser({
             googleId
         }, {
             id: r.uuid(username),
-            username: name || email,
+            username,
             googleId,
             createdAt: r.now()
         });

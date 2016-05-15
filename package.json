@@ -29,6 +29,7 @@
         "space": 4,
         "rules": {
             "prefer-arrow-callback": 1,
+            "camelcase": 1,
             "linebreak-style": [
                 2,
                 "windows"

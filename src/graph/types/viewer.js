@@ -48,7 +48,7 @@ const Viewer = new GraphQLObjectType({
                     type: new GraphQLNonNull(GraphQLString)
                 }
             },
-            resolve(src, {name}) {
+            resolve(viewer, {name}) {
                 return usernameLoader.load(name);
             }
         },
@@ -57,7 +57,7 @@ const Viewer = new GraphQLObjectType({
         stations: {
             type: require('../connections').stationConnection,
             args: connectionArgs,
-            resolve(station, args) {
+            resolve(viewer, args) {
                 return connectionFromReQL(r.table('stations'), args);
             }
         },
@@ -68,7 +68,7 @@ const Viewer = new GraphQLObjectType({
                     type: new GraphQLNonNull(GraphQLString)
                 }
             },
-            resolve(src, {name}) {
+            resolve(viewer, {name}) {
                 return stationNameLoader.load(name);
             }
         },
@@ -77,7 +77,7 @@ const Viewer = new GraphQLObjectType({
         lines: {
             type: require('../connections').lineConnection,
             args: connectionArgs,
-            resolve(station, args) {
+            resolve(viewer, args) {
                 return connectionFromReQL(
                     r.table('stations').concatMap(
                         r.row('lines')

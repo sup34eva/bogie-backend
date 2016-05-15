@@ -70,7 +70,7 @@ export async function connectionFromReQL(table, args) {
         .run();
     const edges = arraySlice.map((value, index) => ({
         cursor: offsetToCursor(startOffset + index),
-        node: value,
+        node: value
     }));
 
     const firstEdge = edges[0];
@@ -85,14 +85,14 @@ export async function connectionFromReQL(table, args) {
             hasPreviousPage:
                 typeof last === 'number' ? startOffset > lowerBound : false,
             hasNextPage:
-                typeof first === 'number' ? endOffset < upperBound : false,
-        },
+                typeof first === 'number' ? endOffset < upperBound : false
+        }
     };
 }
 
 export function fromExpress(middleware) {
     return async ctx => {
-        ctx.body = await new Promise(function(resolve) {
+        ctx.body = await new Promise(function (resolve) {
             middleware(ctx.request, {
                 ...ctx.response,
                 set(...args) {

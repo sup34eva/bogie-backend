@@ -8,6 +8,7 @@ import {
 } from './node';
 
 import viewerField from './types/viewer';
+
 import grantPassword from './mutations/grantPassword';
 import grantFacebook from './mutations/grantFacebook';
 import grantGoogle from './mutations/grantGoogle';

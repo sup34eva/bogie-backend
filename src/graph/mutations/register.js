@@ -39,7 +39,7 @@ export default mutationWithClientMutationId({
             createdAt: r.now()
         });
 
-        if(data.errors) {
+        if (data.errors) {
             throw new Error(data.first_error);
         }
 
