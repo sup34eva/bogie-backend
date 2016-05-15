@@ -16,7 +16,6 @@ import userLoader from '../../loaders/user';
 import usernameLoader from '../../loaders/username';
 import clientLoader from '../../loaders/client';
 import stationNameLoader from '../../loaders/stationName';
-import graphLoader from '../../loaders/graph';
 
 import trainSearch from '../trainSearch';
 import r from '../../db';
@@ -111,19 +110,16 @@ const Viewer = new GraphQLObjectType({
                 }
             },
             resolve(viewer, args) {
-                const path = makePath(
-                    args.from,
-                    args.to,
-                    key => graphLoader.load(key)
-                ).then(path =>
-                    Promise.all(
-                        path.map(name =>
-                            stationNameLoader.load(name)
+                return connectionFromPromisedArray(
+                    makePath(
+                        args.from, args.to
+                    ).then(path =>
+                        Promise.all(
+                            path.map(key => stationNameLoader.load(key))
                         )
-                    )
+                    ),
+                    args
                 );
-
-                return connectionFromPromisedArray(path, args);
             }
         }
     })

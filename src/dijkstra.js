@@ -1,6 +1,7 @@
 import PriorityQueue from 'node-dijkstra/libs/PriorityQueue';
+import graphLoader from './loaders/graph';
 
-export default async function makePath(start, goal, graph) {
+export default async function makePath(start, goal) {
     const explored = new Set();
     const frontier = new PriorityQueue();
     const previous = new Map();
@@ -10,20 +11,19 @@ export default async function makePath(start, goal, graph) {
     frontier.set(start, 0);
 
     function iterate(neighbors, node) {
-        return _node => {
-            const _cost = neighbors[_node];
-
+        return ({weight, edges: [from, to]}) => {
+            const _node = from === node.key ? to : from;
             if (explored.has(_node)) {
                 return false;
             }
 
             if (!frontier.has(_node)) {
                 previous.set(_node, node.key);
-                return frontier.set(_node, node.priority + _cost);
+                return frontier.set(_node, node.priority + weight);
             }
 
             const frontierPriority = frontier.get(_node).priority;
-            const nodeCost = node.priority + _cost;
+            const nodeCost = node.priority + weight;
 
             if (nodeCost < frontierPriority) {
                 previous.set(_node, node.key);
@@ -47,8 +47,8 @@ export default async function makePath(start, goal, graph) {
 
         explored.add(node.key);
 
-        const neighbors = await graph(node.key);
-        Object.keys(neighbors).forEach(iterate(neighbors, node));
+        const neighbors = await graphLoader.load(node.key);
+        neighbors.forEach(iterate(neighbors, node));
     }
 
     if (!path.length) {
