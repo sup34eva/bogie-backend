@@ -25,26 +25,20 @@ export const schemaQL = ctx => {
 };
 
 function fromExpress(middleware) {
-    return async ctx => {
-        try {
-            ctx.body = await new Promise(function (resolve, reject) {
-                middleware(ctx.request, {
-                    ...ctx.response,
-                    set(...args) {
-                        ctx.set(...args);
-                        return this;
-                    },
-                    status(code) {
-                        reject(code);
-                    },
-                    send(body) {
-                        resolve(body);
-                    }
-                });
-            });
-        } catch (code) {
-            ctx.status = code;
-        }
+    return ctx => {
+        middleware(ctx.request, {
+            ...ctx.response,
+            set(...args) {
+                ctx.set(...args);
+                return this;
+            },
+            status(code) {
+                ctx.status = code;
+            },
+            send(body) {
+                ctx.body = body;
+            }
+        });
     };
 }
 
