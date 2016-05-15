@@ -1,24 +1,29 @@
 import {
     GraphQLObjectType,
     GraphQLString,
-    GraphQLNonNull
+    GraphQLNonNull,
+    GraphQLID
 } from 'graphql';
 import {
-    connectionArgs
+    connectionArgs,
+    connectionFromPromisedArray
 } from 'graphql-relay';
 
 import jwt from 'jsonwebtoken';
+import makePath from '../../dijkstra';
 
 import userLoader from '../../loaders/user';
 import usernameLoader from '../../loaders/username';
 import clientLoader from '../../loaders/client';
 import stationNameLoader from '../../loaders/stationName';
+import graphLoader from '../../loaders/graph';
 
 import trainSearch from '../trainSearch';
 import r from '../../db';
 
 import userType from './user';
 import stationType from './station';
+import lineType from './line';
 
 import {
     connectionFromReQL
@@ -79,6 +84,46 @@ const Viewer = new GraphQLObjectType({
                     ).distinct().map(id => ({id})),
                     args
                 );
+            }
+        },
+        line: {
+            type: lineType,
+            args: {
+                id: {
+                    type: new GraphQLNonNull(GraphQLID)
+                }
+            },
+            resolve(viewer, args) {
+                return args;
+            }
+        },
+
+        // Route
+        route: {
+            type: require('../connections').stationConnection,
+            args: {
+                ...connectionArgs,
+                from: {
+                    type: new GraphQLNonNull(GraphQLID)
+                },
+                to: {
+                    type: new GraphQLNonNull(GraphQLID)
+                }
+            },
+            resolve(viewer, args) {
+                const path = makePath(
+                    args.from,
+                    args.to,
+                    key => graphLoader.load(key)
+                ).then(path =>
+                    Promise.all(
+                        path.map(name =>
+                            stationNameLoader.load(name)
+                        )
+                    )
+                );
+
+                return connectionFromPromisedArray(path, args);
             }
         }
     })
