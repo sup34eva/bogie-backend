@@ -9,6 +9,9 @@ import {
 } from 'graphql/utilities';
 
 import schema from './graph';
+import {
+    fromExpress
+} from './utils';
 
 export const schemaJSON = async ctx => {
     try {
@@ -23,24 +26,6 @@ export const schemaJSON = async ctx => {
 export const schemaQL = ctx => {
     ctx.body = printSchema(schema);
 };
-
-function fromExpress(middleware) {
-    return ctx => {
-        middleware(ctx.request, {
-            ...ctx.response,
-            set(...args) {
-                ctx.set(...args);
-                return this;
-            },
-            status(code) {
-                ctx.status = code;
-            },
-            send(body) {
-                ctx.body = body;
-            }
-        });
-    };
-}
 
 export const endpoint = fromExpress(
     graphqlHTTP(request => ({

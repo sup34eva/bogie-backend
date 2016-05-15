@@ -4,8 +4,7 @@ import {
     GraphQLNonNull
 } from 'graphql';
 import {
-    connectionArgs,
-    connectionFromPromisedArray
+    connectionArgs
 } from 'graphql-relay';
 
 import jwt from 'jsonwebtoken';
@@ -20,6 +19,10 @@ import r from '../../db';
 
 import userType from './user';
 import stationType from './station';
+
+import {
+    connectionFromReQL
+} from '../../utils';
 
 const Viewer = new GraphQLObjectType({
     name: 'Viewer',
@@ -50,10 +53,7 @@ const Viewer = new GraphQLObjectType({
             type: require('../connections').stationConnection,
             args: connectionArgs,
             resolve(station, args) {
-                return connectionFromPromisedArray(
-                    r.table('stations').run(),
-                    args
-                );
+                return connectionFromReQL(r.table('stations'), args);
             }
         },
         station: {
@@ -73,10 +73,10 @@ const Viewer = new GraphQLObjectType({
             type: require('../connections').lineConnection,
             args: connectionArgs,
             resolve(station, args) {
-                return connectionFromPromisedArray(
+                return connectionFromReQL(
                     r.table('stations').concatMap(
                         r.row('lines')
-                    ).distinct().map(id => ({id})).run(),
+                    ).distinct().map(id => ({id})),
                     args
                 );
             }
