@@ -5,25 +5,14 @@ import {
 import {
     mutationWithClientMutationId
 } from 'graphql-relay';
-import {
-    compare
-} from 'bcrypt-nodejs';
 import jwt from 'jsonwebtoken';
 
 import usernameLoader from '../../loaders/username';
 import clientLoader from '../../loaders/client';
 
-function compareAsync(data, encrypted) {
-    return new Promise((resolve, reject) => {
-        compare(data, encrypted, (err, res) => {
-            if (err) {
-                reject(err);
-            } else {
-                resolve(res);
-            }
-        });
-    });
-}
+import {
+    compareAsync
+} from '../../utils';
 
 export default mutationWithClientMutationId({
     name: 'GrantPassword',

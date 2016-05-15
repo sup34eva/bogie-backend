@@ -5,24 +5,13 @@ import {
 import {
     mutationWithClientMutationId
 } from 'graphql-relay';
-import {
-    hash
-} from 'bcrypt-nodejs';
 
 import r from '../../db';
 import userType from '../types/user';
 
-function hashAsync(data, salt, progress) {
-    return new Promise((resolve, reject) => {
-        hash(data, salt, progress, (err, res) => {
-            if (err) {
-                reject(err);
-            } else {
-                resolve(res);
-            }
-        });
-    });
-}
+import {
+    hashAsync
+} from '../../utils';
 
 export default mutationWithClientMutationId({
     name: 'Register',

@@ -11,29 +11,9 @@ import fetch from 'isomorphic-fetch';
 import r from '../../db';
 import clientLoader from '../../loaders/client';
 
-async function findOrCreateUser({id, name}) {
-    try {
-        const [user] = await r.table('users').filter({
-            fbId: id
-        });
-
-        return user.id;
-    } catch (e) {
-        const sub = r.uuid(name);
-        const {inserted} = await r.table('users').insert({
-            id: sub,
-            username: name,
-            fbId: id,
-            createdAt: r.now()
-        });
-
-        if (inserted !== 1) {
-            throw new Error('Could not create user');
-        }
-
-        return sub;
-    }
-}
+import {
+    findOrCreateUser
+} from '../../utils';
 
 export default mutationWithClientMutationId({
     name: 'GrantFacebook',
@@ -65,8 +45,15 @@ export default mutationWithClientMutationId({
             throw new Error(`Could not get profile: ${res.statusText}`);
         }
 
-        const user = await res.json();
-        const sub = await findOrCreateUser(user);
+        const {id, name} = await res.json();
+        const sub = await findOrCreateUser({
+            fbId: id
+        }, {
+            id: r.uuid(name),
+            username: name,
+            fbId: id,
+            createdAt: r.now()
+        });
 
         const token = jwt.sign({
             aud: client.id,

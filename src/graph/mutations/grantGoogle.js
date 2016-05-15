@@ -11,31 +11,9 @@ import fetch from 'isomorphic-fetch';
 import r from '../../db';
 import clientLoader from '../../loaders/client';
 
-async function findOrCreateUser({sub, email, name}) {
-    try {
-        const [user] = await r.table('users').filter({
-            googleId: sub
-        });
-
-        return user.id;
-    } catch (e) {
-        const username = name || email;
-        const uuid = r.uuid(username);
-
-        const {inserted} = await r.table('users').insert({
-            id: uuid,
-            username,
-            googleId: sub,
-            createdAt: r.now()
-        });
-
-        if (inserted !== 1) {
-            throw new Error('Could not create user');
-        }
-
-        return uuid;
-    }
-}
+import {
+    findOrCreateUser
+} from '../../utils';
 
 export default mutationWithClientMutationId({
     name: 'GrantGoogle',
@@ -67,8 +45,15 @@ export default mutationWithClientMutationId({
             throw new Error(`Could not get profile: ${res.statusText}`);
         }
 
-        const user = await res.json();
-        const sub = await findOrCreateUser(user);
+        const {sub: googleId, email, name} = await res.json();
+        const sub = await findOrCreateUser({
+            googleId
+        }, {
+            id: r.uuid(username),
+            username: name || email,
+            googleId,
+            createdAt: r.now()
+        });
 
         const token = jwt.sign({
             aud: client.id,
