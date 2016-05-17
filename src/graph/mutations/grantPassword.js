@@ -41,19 +41,28 @@ export default mutationWithClientMutationId({
     },
     async mutateAndGetPayload({clientId, clientSecret, username, password, scope}) {
         const client = await clientLoader.load(clientId);
+        if(client === null) {
+            clientLoader.clear(clientId);
+            throw new Error(`Client "${clientId}" not found`);
+        }
         if (client.secret !== clientSecret) {
             throw new Error('Wrong client secret');
         }
 
         const user = await usernameLoader.load(username);
+        if(user === null) {
+            usernameLoader.clear(username);
+            throw new Error(`User "${username}" not found`);
+        }
+
         const equals = await compareAsync(password, user.password);
         if (!equals) {
             throw new Error('Wrong password');
         }
 
         const token = jwt.sign({
-            sub: user._id,
-            aud: client._id,
+            sub: user.id,
+            aud: client.id,
             scope
         }, process.env.TOKEN_SECRET);
 

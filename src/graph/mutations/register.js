@@ -38,6 +38,10 @@ export default mutationWithClientMutationId({
     },
     async mutateAndGetPayload({clientId, clientSecret, username, password}) {
         const client = await clientLoader.load(clientId);
+        if(client === null) {
+            clientLoader.clear(clientId);
+            throw new Error(`Client "${clientId}" not found`);
+        }
         if (client.secret !== clientSecret) {
             throw new Error('Wrong client secret');
         }

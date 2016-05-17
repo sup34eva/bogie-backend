@@ -142,8 +142,18 @@ export default {
             aud: clientId,
             scope
         } = jwt.verify(token, process.env.TOKEN_SECRET);
+
         const user = await userLoader.load(userId);
+        if (user === null) {
+            userLoader.clear(userId);
+            throw new Error(`Could not find user ${userId}`);
+        }
+
         const client = await clientLoader.load(clientId);
+        if (client === null) {
+            clientLoader.clear(clientId);
+            throw new Error(`Could not find client ${clientId}`);
+        }
 
         return {
             ...rootValue,
