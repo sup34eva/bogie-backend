@@ -1,8 +1,8 @@
+import DataLoader from 'dataloader';
 import {
     hash,
     compare
 } from 'bcrypt-nodejs';
-
 import {
     getOffsetWithDefault,
     offsetToCursor
@@ -108,4 +108,33 @@ export function fromExpress(middleware) {
             });
         });
     };
+}
+
+export function autoCache(table, loader) {
+    r.table(table).changes().run().then(feed => {
+        feed.each((err, {old_val, new_val}) => {
+            if (err) {
+                return console.error(err);
+            }
+
+            if (old_val) {
+                loader.clear(old_val.id);
+            }
+
+            if(new_val) {
+                loader.clear(new_val.id);
+            }
+        });
+    }).catch(err => {
+        console.error(err);
+    });
+
+    return loader;
+}
+
+export function defaultLoader(table) {
+    const getItem = key => r.table(table).get(key);
+    return autoCache(table, new DataLoader(keys =>
+        r.expr(keys).map(getItem)
+    ));;
 }

@@ -8,13 +8,17 @@ const loader = new DataLoader(keys =>
 );
 
 r.table('links').changes().run().then(feed => {
-    feed.each((err, {old_val}) => {
+    feed.each((err, {old_val, new_val}) => {
         if (err) {
             return console.error(err);
         }
 
         if (old_val) {
-            old_val.edges.forEach(loader.clear);
+            old_val.edges.forEach(loader.clear.bind(loader));
+        }
+
+        if (new_val) {
+            new_val.edges.forEach(loader.clear.bind(loader));
         }
     });
 }).catch(err => {
