@@ -8,6 +8,7 @@ import {
 
 import r from '../../db';
 import userType from '../types/user';
+import clientLoader from '../../loaders/client';
 
 import {
     hashAsync
@@ -22,6 +23,12 @@ export default mutationWithClientMutationId({
         },
         password: {
             type: new GraphQLNonNull(GraphQLString)
+        },
+        clientId: {
+            type: new GraphQLNonNull(GraphQLString)
+        },
+        clientSecret: {
+            type: new GraphQLNonNull(GraphQLString)
         }
     },
     outputFields: {
@@ -29,7 +36,12 @@ export default mutationWithClientMutationId({
             type: userType
         }
     },
-    async mutateAndGetPayload({username, password}) {
+    async mutateAndGetPayload({clientId, clientSecret, username, password}) {
+        const client = await clientLoader.load(clientId);
+        if (client.secret !== clientSecret) {
+            throw new Error('Wrong client secret');
+        }
+
         const encryptedPass = await hashAsync(password);
         const id = r.uuid(username);
         const data = await r.table('users').insert({
