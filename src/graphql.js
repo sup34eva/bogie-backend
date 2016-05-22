@@ -11,7 +11,7 @@ import {
 import schema from './graph';
 import {
     fromExpress
-} from './utils';
+} from './utils/koa';
 
 export const schemaJSON = async ctx => {
     try {

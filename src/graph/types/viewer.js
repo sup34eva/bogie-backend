@@ -26,7 +26,7 @@ import lineType from './line';
 
 import {
     connectionFromReQL
-} from '../../utils';
+} from '../../utils/rdb';
 
 const Viewer = new GraphQLObjectType({
     name: 'Viewer',

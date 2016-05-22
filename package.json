@@ -67,6 +67,7 @@
         "koa-morgan": "^1.0.1",
         "koa-router": "^7.0.1",
         "node-dijkstra": "^2.2.1",
+        "paypal-rest-sdk": "^1.6.8",
         "rethinkdbdash": "^2.3.6"
     },
     "pre-commit": [

@@ -1,5 +1,5 @@
 import {
     defaultLoader
-} from '../utils';
+} from '../utils/loader';
 
 export default defaultLoader('stations');

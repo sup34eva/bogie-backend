@@ -2,19 +2,18 @@ import {
     GraphQLNonNull,
     GraphQLString
 } from 'graphql';
-import {
-    mutationWithClientMutationId
-} from 'graphql-relay';
 
 import r from '../../db';
 import userType from '../types/user';
-import clientLoader from '../../loaders/client';
 
 import {
+    mutationWithClientCheck
+} from '../../utils/mutation';
+import {
     hashAsync
-} from '../../utils';
+} from '../../utils/crypto';
 
-export default mutationWithClientMutationId({
+export default mutationWithClientCheck({
     name: 'Register',
     description: 'Register a new user',
     inputFields: {
@@ -23,12 +22,6 @@ export default mutationWithClientMutationId({
         },
         password: {
             type: new GraphQLNonNull(GraphQLString)
-        },
-        clientId: {
-            type: new GraphQLNonNull(GraphQLString)
-        },
-        clientSecret: {
-            type: new GraphQLNonNull(GraphQLString)
         }
     },
     outputFields: {
@@ -36,16 +29,7 @@ export default mutationWithClientMutationId({
             type: userType
         }
     },
-    async mutateAndGetPayload({clientId, clientSecret, username, password}) {
-        const client = await clientLoader.load(clientId);
-        if(client === null) {
-            clientLoader.clear(clientId);
-            throw new Error(`Client "${clientId}" not found`);
-        }
-        if (client.secret !== clientSecret) {
-            throw new Error('Wrong client secret');
-        }
-
+    async mutateAndGetPayload({username, password}) {
         const encryptedPass = await hashAsync(password);
         const id = r.uuid(username);
         const data = await r.table('users').insert({

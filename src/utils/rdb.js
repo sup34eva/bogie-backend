@@ -1,38 +1,9 @@
-import DataLoader from 'dataloader';
-import {
-    hash,
-    compare
-} from 'bcrypt-nodejs';
 import {
     getOffsetWithDefault,
     offsetToCursor
 } from 'graphql-relay';
 
-import r from './db';
-
-export function hashAsync(data, salt, progress) {
-    return new Promise((resolve, reject) => {
-        hash(data, salt, progress, (err, res) => {
-            if (err) {
-                reject(err);
-            } else {
-                resolve(res);
-            }
-        });
-    });
-}
-
-export function compareAsync(data, encrypted) {
-    return new Promise((resolve, reject) => {
-        compare(data, encrypted, (err, res) => {
-            if (err) {
-                reject(err);
-            } else {
-                resolve(res);
-            }
-        });
-    });
-}
+import r from '../db';
 
 export async function findOrCreateUser(filter, insert) {
     try {
@@ -88,53 +59,4 @@ export async function connectionFromReQL(table, args) {
                 typeof first === 'number' ? endOffset < upperBound : false
         }
     };
-}
-
-export function fromExpress(middleware) {
-    return async ctx => {
-        ctx.body = await new Promise(function (resolve) {
-            middleware(ctx.request, {
-                ...ctx.response,
-                set(...args) {
-                    ctx.set(...args);
-                    return this;
-                },
-                status(code) {
-                    ctx.status = code;
-                },
-                send(body) {
-                    resolve(body);
-                }
-            });
-        });
-    };
-}
-
-export function autoCache(table, loader) {
-    r.table(table).changes().run().then(feed => {
-        feed.each((err, {old_val, new_val}) => {
-            if (err) {
-                return console.error(err);
-            }
-
-            if (old_val) {
-                loader.clear(old_val.id);
-            }
-
-            if(new_val) {
-                loader.clear(new_val.id);
-            }
-        });
-    }).catch(err => {
-        console.error(err);
-    });
-
-    return loader;
-}
-
-export function defaultLoader(table) {
-    const getItem = key => r.table(table).get(key);
-    return autoCache(table, new DataLoader(keys =>
-        r.expr(keys).map(getItem)
-    ));;
 }

@@ -8,19 +8,23 @@ const loader = new DataLoader(keys =>
 );
 
 r.table('users').changes().run().then(feed => {
-    feed.each((err, {old_val, new_val}) => {
-        if (err) {
-            return console.error(err);
-        }
+    const getNext = () =>
+        feed.next()
+            .then(({old_val, new_val}) => {
+                if (old_val) {
+                    loader.clear(old_val.name);
+                }
 
-        if (old_val) {
-            loader.clear(old_val.name);
-        }
+                if(new_val) {
+                    loader.clear(new_val.name);
+                }
+            })
+            .then(getNext)
+            .catch(err => {
+                console.error(err);
+            });
 
-        if(new_val) {
-            loader.clear(new_val.name);
-        }
-    });
+    return getNext();
 }).catch(err => {
     console.error(err);
 });

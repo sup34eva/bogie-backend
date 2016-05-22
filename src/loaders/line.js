@@ -9,20 +9,24 @@ const loader = new DataLoader(keys =>
     ).run()
 );
 
-r.table('stations').changes().run().then(feed => {
-    feed.each((err, {old_val, new_val}) => {
-        if (err) {
-            return console.error(err);
-        }
+r.table('stations').changes().then(feed => {
+    const getNext = () =>
+        feed.next()
+            .then(({old_val, new_val}) => {
+                if (old_val) {
+                    old_val.lines.forEach(loader.clear.bind(loader));
+                }
 
-        if (old_val) {
-            old_val.lines.forEach(loader.clear.bind(loader));
-        }
+                if(new_val) {
+                    new_val.lines.forEach(loader.clear.bind(loader));
+                }
+            })
+            .then(getNext)
+            .catch(err => {
+                console.error(err);
+            });
 
-        if(new_val) {
-            new_val.lines.forEach(loader.clear.bind(loader));
-        }
-    });
+    return getNext();
 }).catch(err => {
     console.error(err);
 });

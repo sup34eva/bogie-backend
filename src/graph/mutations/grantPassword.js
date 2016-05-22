@@ -2,28 +2,21 @@ import {
     GraphQLNonNull,
     GraphQLString
 } from 'graphql';
-import {
-    mutationWithClientMutationId
-} from 'graphql-relay';
 import jwt from 'jsonwebtoken';
 
 import usernameLoader from '../../loaders/username';
-import clientLoader from '../../loaders/client';
 
 import {
+    mutationWithClientCheck
+} from '../../utils/mutation';
+import {
     compareAsync
-} from '../../utils';
+} from '../../utils/crypto';
 
-export default mutationWithClientMutationId({
+export default mutationWithClientCheck({
     name: 'GrantPassword',
     description: `Allows an authenticated client to obtain an access token with a user's credentials`,
     inputFields: {
-        clientId: {
-            type: new GraphQLNonNull(GraphQLString)
-        },
-        clientSecret: {
-            type: new GraphQLNonNull(GraphQLString)
-        },
         username: {
             type: new GraphQLNonNull(GraphQLString)
         },
@@ -39,16 +32,7 @@ export default mutationWithClientMutationId({
             type: GraphQLString
         }
     },
-    async mutateAndGetPayload({clientId, clientSecret, username, password, scope}) {
-        const client = await clientLoader.load(clientId);
-        if(client === null) {
-            clientLoader.clear(clientId);
-            throw new Error(`Client "${clientId}" not found`);
-        }
-        if (client.secret !== clientSecret) {
-            throw new Error('Wrong client secret');
-        }
-
+    async mutateAndGetPayload({username, password, scope}) {
         const user = await usernameLoader.load(username);
         if(user === null) {
             usernameLoader.clear(username);

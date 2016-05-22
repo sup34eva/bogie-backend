@@ -25,7 +25,7 @@ export const {nodeInterface, nodeField} = nodeDefinitions(
         return null;
     },
     obj => {
-        console.log(obj);
+        console.log('node', obj);
 
         if (obj.departure) {
             return require('./types/train').default;
