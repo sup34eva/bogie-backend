@@ -13,7 +13,7 @@ import jwt from 'jsonwebtoken';
 import makePath from '../../dijkstra';
 
 import userLoader from '../../loaders/user';
-import usernameLoader from '../../loaders/username';
+import emailLoader from '../../loaders/email';
 import clientLoader from '../../loaders/client';
 import stationNameLoader from '../../loaders/stationName';
 
@@ -43,12 +43,12 @@ const Viewer = new GraphQLObjectType({
         user: {
             type: userType,
             args: {
-                name: {
+                email: {
                     type: new GraphQLNonNull(GraphQLString)
                 }
             },
-            resolve(viewer, {name}) {
-                return usernameLoader.load(name);
+            resolve(viewer, {email}) {
+                return emailLoader.load(email);
             }
         },
 

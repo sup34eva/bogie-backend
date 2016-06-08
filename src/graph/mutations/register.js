@@ -17,7 +17,7 @@ export default mutationWithClientCheck({
     name: 'Register',
     description: 'Register a new user',
     inputFields: {
-        username: {
+        email: {
             type: new GraphQLNonNull(GraphQLString)
         },
         password: {
@@ -29,12 +29,12 @@ export default mutationWithClientCheck({
             type: userType
         }
     },
-    async mutateAndGetPayload({username, password}) {
+    async mutateAndGetPayload({email, password}) {
         const encryptedPass = await hashAsync(password);
-        const id = r.uuid(username);
+        const id = r.uuid(email);
         const data = await r.table('users').insert({
             id,
-            username,
+            email,
             password: encryptedPass,
             createdAt: r.now()
         });

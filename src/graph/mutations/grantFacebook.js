@@ -28,19 +28,14 @@ export default mutationWithClientCheck({
         }
     },
     async mutateAndGetPayload({clientId, accessToken}) {
-        const res = await fetch(`https://graph.facebook.com/v2.5/me?fields=id%2Cname%2Cemail&access_token=${accessToken}`);
+        const res = await fetch(`https://graph.facebook.com/v2.5/me?fields=id%2Cemail&access_token=${accessToken}`);
         if (!res.ok) {
             throw new Error(`Could not get profile: ${res.statusText}`);
         }
 
-        const {id, name} = await res.json();
-        const sub = await findOrCreateUser({
+        const {id, email} = await res.json();
+        const sub = await findOrCreateUser(email, {
             fbId: id
-        }, {
-            id: r.uuid(name),
-            username: name,
-            fbId: id,
-            createdAt: r.now()
         });
 
         const token = jwt.sign({

@@ -33,15 +33,9 @@ export default mutationWithClientCheck({
             throw new Error(`Could not get profile: ${res.statusText}`);
         }
 
-        const {sub: googleId, email, name} = await res.json();
-        const username = name || email;
-        const sub = await findOrCreateUser({
+        const {sub: googleId, email} = await res.json();
+        const sub = await findOrCreateUser(email, {
             googleId
-        }, {
-            id: r.uuid(username),
-            username,
-            googleId,
-            createdAt: r.now()
         });
 
         const token = jwt.sign({

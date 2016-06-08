@@ -20,7 +20,7 @@ export default new GraphQLObjectType({
     description: 'A generic user of the service',
     fields: {
         id: globalIdField('User'),
-        username: {
+        email: {
             type: GraphQLString
         },
         history: {

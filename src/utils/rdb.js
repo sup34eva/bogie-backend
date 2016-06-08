@@ -4,20 +4,40 @@ import {
 } from 'graphql-relay';
 
 import r from '../db';
+import emailLoader from '../../loaders/email';
 
-export async function findOrCreateUser(filter, insert) {
-    try {
-        const [user] = await r.table('users').filter(filter);
-        return user.id;
-    } catch (e) {
-        const {inserted} = await r.table('users').insert(insert);
+export async function findOrCreateUser(email, data) {
+    const users = await r.table('users').filter(data);
+    if (users.length > 0) {
+        return users[0].id;
+    }
 
-        if (inserted !== 1) {
-            throw new Error('Could not create user');
+    const user = await emailLoader.load(insert.email);
+    if (user !== null) {
+        const {updated} = await r.table('users').get(user.id).update({
+            ...merge,
+            ...filter
+        });
+
+        if (updated !== 1) {
+            throw new Error('Could not update user');
         }
 
-        return insert.id;
+        return merge.id;
     }
+
+    const {inserted} = await r.table('users').insert({
+        id: r.uuid(email),
+        email,
+        createdAt: r.now(),
+        ...data
+    });
+
+    if (inserted !== 1) {
+        throw new Error('Could not create user');
+    }
+
+    return r.uuid(email);
 }
 
 export async function connectionFromReQL(table, args) {

@@ -4,7 +4,7 @@ import {
 } from 'graphql';
 import jwt from 'jsonwebtoken';
 
-import usernameLoader from '../../loaders/username';
+import emailLoader from '../../loaders/email';
 
 import {
     mutationWithClientCheck
@@ -17,7 +17,7 @@ export default mutationWithClientCheck({
     name: 'GrantPassword',
     description: `Allows an authenticated client to obtain an access token with a user's credentials`,
     inputFields: {
-        username: {
+        email: {
             type: new GraphQLNonNull(GraphQLString)
         },
         password: {
@@ -32,11 +32,11 @@ export default mutationWithClientCheck({
             type: GraphQLString
         }
     },
-    async mutateAndGetPayload({username, password, scope}) {
-        const user = await usernameLoader.load(username);
+    async mutateAndGetPayload({email, password, scope}) {
+        const user = await emailLoader.load(email);
         if(user === null) {
-            usernameLoader.clear(username);
-            throw new Error(`User "${username}" not found`);
+            emailLoader.clear(email);
+            throw new Error(`User "${email}" not found`);
         }
 
         const equals = await compareAsync(password, user.password);
