@@ -4,7 +4,7 @@ import {
 } from 'graphql-relay';
 
 import r from '../db';
-import emailLoader from '../../loaders/email';
+import emailLoader from '../loaders/email';
 
 export async function findOrCreateUser(email, data) {
     const users = await r.table('users').filter(data);
