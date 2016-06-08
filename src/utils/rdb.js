@@ -26,6 +26,7 @@ export async function findOrCreateUser(email, data) {
         return merge.id;
     }
 
+    emailLoader.clear(email);
     const {inserted} = await r.table('users').insert({
         id: r.uuid(email),
         email,

@@ -32,7 +32,7 @@ export default mutationWithClientCheck({
             type: GraphQLString
         }
     },
-    async mutateAndGetPayload({email, password, scope}) {
+    async mutateAndGetPayload({clientId, email, password, scope}) {
         const user = await emailLoader.load(email);
         if(user === null) {
             emailLoader.clear(email);
@@ -46,7 +46,7 @@ export default mutationWithClientCheck({
 
         const token = jwt.sign({
             sub: user.id,
-            aud: client.id,
+            aud: clientId,
             scope
         }, process.env.TOKEN_SECRET);
 
