@@ -12,7 +12,7 @@ export async function findOrCreateUser(email, data) {
         return users[0].id;
     }
 
-    const user = await emailLoader.load(insert.email);
+    const user = await emailLoader.load(email);
     if (user !== null) {
         const {updated} = await r.table('users').get(user.id).update({
             ...merge,
