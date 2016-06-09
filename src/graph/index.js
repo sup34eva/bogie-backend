@@ -15,6 +15,8 @@ import grantGoogle from './mutations/grantGoogle';
 import register from './mutations/register';
 import createPayment from './mutations/createPayment';
 import executePayment from './mutations/executePayment';
+import editPassword from './mutations/editPassword';
+import editMail from './mutations/editMail';
 
 export default new GraphQLSchema({
     query: new GraphQLObjectType({
@@ -32,7 +34,9 @@ export default new GraphQLSchema({
             grantPassword,
             register,
             createPayment,
-            executePayment
+            executePayment,
+            editPassword,
+            editMail
         }
     })
 });
