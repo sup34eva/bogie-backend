@@ -55,9 +55,19 @@ const Viewer = new GraphQLObjectType({
         // Stations
         stations: {
             type: require('../connections').stationConnection,
-            args: connectionArgs,
+            args: {
+                ...connectionArgs,
+                filter: {
+                    type: GraphQLString
+                }
+            },
             resolve(viewer, args) {
-                return connectionFromReQL(r.table('stations'), args);
+                return connectionFromReQL(args.filter ?
+                    r.table('stations').filter(
+                        r.row('name').slice(0, args.filter.length).downcase().eq(args.filter.toLowerCase())
+                    ) :
+                    r.table('stations')
+                , args);
             }
         },
         station: {
