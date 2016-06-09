@@ -17,7 +17,6 @@ import emailLoader from '../../loaders/email';
 import clientLoader from '../../loaders/client';
 import stationNameLoader from '../../loaders/stationName';
 
-import trainSearch from '../trainSearch';
 import r from '../../db';
 
 import userType from './user';
@@ -32,9 +31,6 @@ const Viewer = new GraphQLObjectType({
     name: 'Viewer',
     description: 'A holder type to access other data',
     fields: () => ({
-        // Trains
-        trains: trainSearch,
-
         // Users
         me: {
             type: userType,
