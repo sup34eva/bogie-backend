@@ -123,11 +123,7 @@ const Viewer = new GraphQLObjectType({
                 return connectionFromPromisedArray(
                     makePath(
                         args.from, args.to
-                    ).then(path =>
-                        Promise.all(
-                            path.map(key => stationNameLoader.load(key))
-                        )
-                    ),
+                    ).then(path => stationNameLoader.loadMany(path)),
                     args
                 );
             }

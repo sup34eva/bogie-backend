@@ -52,7 +52,7 @@ export default async function makePath(start, goal) {
     }
 
     if (!path.length) {
-        throw new Error('Path is empty');
+        return [];
     }
 
     return path.concat([
