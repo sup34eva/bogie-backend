@@ -5,7 +5,7 @@ import {
 import {
     globalIdField,
     connectionArgs,
-    connectionFromPromisedArray
+    connectionFromArray
 } from 'graphql-relay';
 import {
     nodeInterface
@@ -22,7 +22,7 @@ export default new GraphQLObjectType({
             type: require('../connections').stationConnection,
             args: connectionArgs,
             resolve({stations}, args) {
-                return connectionFromPromisedArray(stations, args);
+                return connectionFromArray(stations, args);
             }
         },
         date: {

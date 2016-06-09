@@ -115,10 +115,13 @@ const Viewer = new GraphQLObjectType({
                 }
             },
             resolve(viewer, args) {
-                return {
-                    stations: makePath(args.from, args.to).then(path => stationNameLoader.loadMany(path)),
-                    date: new Date(),
-                    price: 100
+                return makePath(args.from, args.to)
+                    .then(path => stationNameLoader.loadMany(path))
+                    .then(stations => ({
+                        stations,
+                        date: new Date(),
+                        price: 100
+                    }));
                 };
             }
         }
