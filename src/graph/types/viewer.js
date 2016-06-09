@@ -122,7 +122,6 @@ const Viewer = new GraphQLObjectType({
                         date: new Date(),
                         price: 100
                     }));
-                };
             }
         }
     })
