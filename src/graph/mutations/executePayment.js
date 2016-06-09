@@ -5,7 +5,10 @@ import {
 } from 'graphql';
 import jwt from 'jsonwebtoken';
 
+import r from '../../db';
+import makePath from '../../dijkstra';
 import userLoader from '../../loaders/user';
+import stationLoader from '../../loaders/stationName';
 
 import {
     mutationWithClientCheck
@@ -24,8 +27,18 @@ export default mutationWithClientCheck({
     name: 'ExecutePayment',
     description: `Execute a PayPal payment`,
     inputFields: {
+        email: {
+            type: GraphQLString
+        },
         accessToken: {
             type: GraphQLString
+        },
+
+        from: {
+            type: new GraphQLNonNull(GraphQLID)
+        },
+        to: {
+            type: new GraphQLNonNull(GraphQLID)
         },
 
         payment: {
@@ -40,7 +53,7 @@ export default mutationWithClientCheck({
             type: GraphQLString
         }
     },
-    async mutateAndGetPayload({accessToken, payment: paymentId, payer}) {
+    async mutateAndGetPayload({email, accessToken, from, to, payment: paymentId, payer}) {
         await executePayment(paymentId, {
             payer_id: payer
         });
@@ -51,13 +64,31 @@ export default mutationWithClientCheck({
             } = jwt.verify(accessToken, process.env.TOKEN_SECRET);
 
             const user = userLoader.load(userId);
-            await sendMail(user.email, 'Bogie', `
-                You got mail !
-            `);
+            email = user.email;
+
+            if (user.history) {
+                await r.table('users').get(userId)('history').append({from, to});
+            } else {
+                await r.table('users').get(userId).update({
+                    history: [{from, to}]
+                });
+            }
         }
 
+        const path = makePath(from, to);
+        const start = await stationLoader.load(from);
+        const end = await stationLoader.load(to);
+        await sendMail(email, 'Bogie - Ticket', `
+            You just purchased a ticket from ${start.name} to ${end.name} for ${path.length * 0.25}€.
+        `);
+
         return {
-            receipt: await makePDF(`Receipt`)
+            receipt: await makePDF(`
+                # Receipt
+                Departure: ${start.name}
+                Arrival: ${end.name}
+                Price: ${path.length * 0.25}€
+            `)
         };
     }
 });

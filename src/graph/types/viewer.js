@@ -1,7 +1,8 @@
 import {
     GraphQLObjectType,
-    GraphQLString,
     GraphQLNonNull,
+    GraphQLString,
+    GraphQLInt,
     GraphQLID
 } from 'graphql';
 import {
@@ -11,6 +12,7 @@ import {
 import jwt from 'jsonwebtoken';
 import makePath from '../../dijkstra';
 
+import dateType from '../../loaders/date';
 import userLoader from '../../loaders/user';
 import emailLoader from '../../loaders/email';
 import clientLoader from '../../loaders/client';
@@ -112,16 +114,26 @@ const Viewer = new GraphQLObjectType({
                 },
                 to: {
                     type: new GraphQLNonNull(GraphQLID)
+                },
+                date: {
+                    type: new GraphQLNonNull(dateType)
+                },
+                before: {
+                    type: new GraphQLNonNull(GraphQLInt)
+                },
+                after: {
+                    type: new GraphQLNonNull(GraphQLInt)
                 }
             },
             resolve(viewer, args) {
+                const time = args.after + Math.round((args.before - args.after) * Math.random());
                 return makePath(args.from, args.to)
                     .then(path => stationNameLoader.loadMany(path))
                     .then(stations => ({
                         id: `${args.from}:${args.to}`,
                         stations,
-                        date: new Date(),
-                        price: 100
+                        date: new Date(args.date.getTime() + (time * 15 * 60 * 1000)),
+                        price: stations.length * 0.25
                     }));
             }
         }

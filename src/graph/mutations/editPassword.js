@@ -47,7 +47,7 @@ export default mutationWithClientCheck({
         }
 
         const encryptedPass = await hashAsync(newPassword);
-        const data = await r.table('users').get(user.id).update({
+        const data = await r.table('users').get(currentId).update({
             password: encryptedPass
         });
 

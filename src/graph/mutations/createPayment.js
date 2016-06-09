@@ -1,8 +1,10 @@
 import {
     GraphQLNonNull,
-    GraphQLString
+    GraphQLString,
+    GraphQLID
 } from 'graphql';
 
+import makePath from '../../dijkstra';
 import paymentType from '../types/payment';
 
 import {
@@ -16,6 +18,13 @@ export default mutationWithClientCheck({
     name: 'CreatePayment',
     description: `Create a PayPal payment intent`,
     inputFields: {
+        from: {
+            type: new GraphQLNonNull(GraphQLID)
+        },
+        to: {
+            type: new GraphQLNonNull(GraphQLID)
+        },
+
         returnUrl: {
             type: new GraphQLNonNull(GraphQLString)
         },
@@ -28,27 +37,26 @@ export default mutationWithClientCheck({
             type: paymentType
         }
     },
-    async mutateAndGetPayload({returnUrl, cancelUrl}) {
-        const payment = await createPayment({
-            intent: 'sale',
-            payer: {
-                payment_method: 'paypal'
-            },
-            redirect_urls: {
-                return_url: returnUrl,
-                cancel_url: cancelUrl
-            },
-            transactions: [{
-                description: 'Train ticket',
-                amount: {
-                    currency: 'EUR',
-                    total: '100'
-                }
-            }]
-        });
-
+    async mutateAndGetPayload({from, to, returnUrl, cancelUrl}) {
+        const path = makePath(from, to);
         return {
-            payment
+            payment: await createPayment({
+                intent: 'sale',
+                payer: {
+                    payment_method: 'paypal'
+                },
+                redirect_urls: {
+                    return_url: returnUrl,
+                    cancel_url: cancelUrl
+                },
+                transactions: [{
+                    description: 'Train ticket',
+                    amount: {
+                        currency: 'EUR',
+                        total: path.length * 0.25
+                    }
+                }]
+            })
         };
     }
 });

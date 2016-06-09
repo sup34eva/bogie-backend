@@ -28,18 +28,23 @@ export default new GraphQLObjectType({
             type: new GraphQLEnumType({
                 name: 'UserType',
                 values: {
-                    EMAIL: {value: 0},
-                    FACEBOOK: {value: 1},
-                    GOOGLE: {value: 2}
+                    UNKNOWN: {value: 0},
+                    EMAIL: {value: 1},
+                    FACEBOOK: {value: 2},
+                    GOOGLE: {value: 3}
                 }
             }),
             resolve(user) {
-                if (user.fbId) {
+                if (user.password) {
                     return 1;
                 }
 
-                if (user.googleId) {
+                if (user.fbId) {
                     return 2;
+                }
+
+                if (user.googleId) {
+                    return 3;
                 }
 
                 return 0;
