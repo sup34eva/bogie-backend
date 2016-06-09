@@ -3,16 +3,12 @@ import {
     nodeDefinitions
 } from 'graphql-relay';
 
-import trainLoader from '../loaders/train';
 import stationLoader from '../loaders/station';
 import userLoader from '../loaders/user';
 
 export const {nodeInterface, nodeField} = nodeDefinitions(
     globalId => {
         const {type, id} = fromGlobalId(globalId);
-        if (type === 'Train') {
-            return trainLoader.load(id);
-        }
         if (type === 'Station') {
             return stationLoader.load(id);
         }
