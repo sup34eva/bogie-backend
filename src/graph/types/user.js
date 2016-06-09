@@ -10,7 +10,8 @@ import {
     connectionFromPromisedArray
 } from 'graphql-relay';
 
-import trainLoader from '../../loaders/train';
+import makePath from '../../dijkstra';
+import stationNameLoader from '../../loaders/stationName';
 
 import {
     nodeInterface
@@ -56,7 +57,18 @@ export default new GraphQLObjectType({
             resolve(user, args) {
                 if (user.history) {
                     return connectionFromPromisedArray(
-                        trainLoader.loadMany(user.history),
+                        Promise.all(
+                            user.history.map(({from, to}) =>
+                                makePath(from, to)
+                                    .then(path => stationNameLoader.loadMany(path))
+                                    .then(stations => ({
+                                        id: `${args.from}:${args.to}`,
+                                        stations,
+                                        date: new Date(),
+                                        price: stations.length * 0.25
+                                    }))
+                            )
+                        ),
                         args
                     );
                 }

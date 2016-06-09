@@ -12,7 +12,6 @@ import {
 import jwt from 'jsonwebtoken';
 import makePath from '../../dijkstra';
 
-import dateType from '../../loaders/date';
 import userLoader from '../../loaders/user';
 import emailLoader from '../../loaders/email';
 import clientLoader from '../../loaders/client';
@@ -20,6 +19,7 @@ import stationNameLoader from '../../loaders/stationName';
 
 import r from '../../db';
 
+import dateType from './date';
 import userType from './user';
 import stationType from './station';
 import lineType from './line';
