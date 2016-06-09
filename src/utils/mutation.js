@@ -21,9 +21,9 @@ export function mutationWithClientCheck(config) {
         },
         async mutateAndGetPayload(input, context, info) {
             const client = await clientLoader.load(input.clientId);
-            if(client === null) {
+            if (client === null) {
                 clientLoader.clear(input.clientId);
-                throw new Error(`Client "${clientId}" not found`);
+                throw new Error(`Client "${input.clientId}" not found`);
             }
             if (client.secret !== input.clientSecret) {
                 throw new Error('Wrong client secret');

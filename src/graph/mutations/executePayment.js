@@ -4,7 +4,6 @@ import {
     GraphQLID
 } from 'graphql';
 
-import r from '../../db';
 import paymentType from '../types/payment';
 
 import {

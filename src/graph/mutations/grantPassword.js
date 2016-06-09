@@ -34,7 +34,7 @@ export default mutationWithClientCheck({
     },
     async mutateAndGetPayload({clientId, email, password, scope}) {
         const user = await emailLoader.load(email);
-        if(user === null) {
+        if (user === null) {
             emailLoader.clear(email);
             throw new Error(`User "${email}" not found`);
         }

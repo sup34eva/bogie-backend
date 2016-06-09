@@ -14,7 +14,7 @@ r.table('stations').changes().run().then(feed => {
                     loader.clear(old_val.name);
                 }
 
-                if(new_val) {
+                if (new_val) {
                     loader.clear(new_val.name);
                 }
             })

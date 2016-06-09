@@ -2,9 +2,6 @@ import {
     GraphQLNonNull,
     GraphQLString
 } from 'graphql';
-import {
-    mutationWithClientMutationId
-} from 'graphql-relay';
 import jwt from 'jsonwebtoken';
 
 import r from '../../db';
@@ -64,7 +61,7 @@ export default mutationWithClientCheck({
             scope
         }, process.env.TOKEN_SECRET);
 
-        return r.table('users').get(id).then(user => ({
+        return r.table('users').get(newId).then(user => ({
             token: newToken,
             user
         }));

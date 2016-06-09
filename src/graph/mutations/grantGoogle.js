@@ -5,8 +5,6 @@ import {
 import jwt from 'jsonwebtoken';
 import fetch from 'isomorphic-fetch';
 
-import r from '../../db';
-
 import {
     mutationWithClientCheck
 } from '../../utils/mutation';

@@ -1,33 +1,36 @@
 import {
-  GraphQLObjectType
+    GraphQLFloat,
+    GraphQLObjectType
 } from 'graphql';
 import {
-    globalIdField
+    globalIdField,
+    connectionArgs,
+    connectionFromPromisedArray
 } from 'graphql-relay';
 import {
     nodeInterface
 } from '../node';
 
-import stationType from './station';
 import dateType from './date';
-import stationLoader from '../../loaders/station';
 
 export default new GraphQLObjectType({
     name: 'Train',
     description: 'A train travel',
-    fields: {
+    fields: () => ({
         id: globalIdField('Train'),
-        departure: {
-            type: stationType,
-            resolve: ({departure}) => stationLoader.load(departure)
-        },
-        arrival: {
-            type: stationType,
-            resolve: ({arrival}) => stationLoader.load(arrival)
+        stations: {
+            type: require('../connections').stationConnection,
+            args: connectionArgs,
+            resolve({stations}, args) {
+                return connectionFromPromisedArray(stations, args);
+            }
         },
         date: {
             type: dateType
+        },
+        price: {
+            type: GraphQLFloat
         }
-    },
+    }),
     interfaces: [nodeInterface]
 });

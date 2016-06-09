@@ -5,8 +5,7 @@ import {
     GraphQLID
 } from 'graphql';
 import {
-    connectionArgs,
-    connectionFromPromisedArray
+    connectionArgs
 } from 'graphql-relay';
 
 import jwt from 'jsonwebtoken';
@@ -22,6 +21,7 @@ import r from '../../db';
 import userType from './user';
 import stationType from './station';
 import lineType from './line';
+import trainType from './train';
 
 import {
     connectionFromReQL
@@ -103,11 +103,10 @@ const Viewer = new GraphQLObjectType({
             }
         },
 
-        // Route
-        route: {
-            type: require('../connections').stationConnection,
+        // Train
+        train: {
+            type: trainType,
             args: {
-                ...connectionArgs,
                 from: {
                     type: new GraphQLNonNull(GraphQLID)
                 },
@@ -116,12 +115,11 @@ const Viewer = new GraphQLObjectType({
                 }
             },
             resolve(viewer, args) {
-                return connectionFromPromisedArray(
-                    makePath(
-                        args.from, args.to
-                    ).then(path => stationNameLoader.loadMany(path)),
-                    args
-                );
+                return {
+                    stations: makePath(args.from, args.to).then(path => stationNameLoader.loadMany(path)),
+                    date: new Date(),
+                    price: 100
+                };
             }
         }
     })

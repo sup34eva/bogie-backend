@@ -17,7 +17,7 @@ r.table('stations').changes().then(feed => {
                     old_val.lines.forEach(loader.clear.bind(loader));
                 }
 
-                if(new_val) {
+                if (new_val) {
                     new_val.lines.forEach(loader.clear.bind(loader));
                 }
             })

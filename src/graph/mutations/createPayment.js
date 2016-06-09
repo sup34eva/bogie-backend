@@ -3,7 +3,6 @@ import {
     GraphQLString
 } from 'graphql';
 
-import r from '../../db';
 import paymentType from '../types/payment';
 
 import {
@@ -33,7 +32,7 @@ export default mutationWithClientCheck({
             type: paymentType
         }
     },
-    async mutateAndGetPayload({accessToken, returnUrl, cancelUrl}) {
+    async mutateAndGetPayload({returnUrl, cancelUrl}) {
         const payment = await createPayment({
             intent: 'sale',
             payer: {
@@ -47,7 +46,7 @@ export default mutationWithClientCheck({
                 description: 'Train ticket',
                 amount: {
                     currency: 'EUR',
-                    total: '100',
+                    total: '100'
                 }
             }]
         });

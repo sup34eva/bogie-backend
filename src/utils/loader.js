@@ -10,7 +10,7 @@ export function autoCache(table, loader) {
                         loader.clear(old_val.id);
                     }
 
-                    if(new_val) {
+                    if (new_val) {
                         loader.clear(new_val.id);
                     }
                 })

@@ -15,15 +15,15 @@ export async function findOrCreateUser(email, data) {
     const user = await emailLoader.load(email);
     if (user !== null) {
         const {updated} = await r.table('users').get(user.id).update({
-            ...merge,
-            ...filter
+            ...user,
+            ...data
         });
 
         if (updated !== 1) {
             throw new Error('Could not update user');
         }
 
-        return merge.id;
+        return user.id;
     }
 
     emailLoader.clear(email);

@@ -2,9 +2,6 @@ import {
     GraphQLNonNull,
     GraphQLString
 } from 'graphql';
-import {
-    mutationWithClientMutationId
-} from 'graphql-relay';
 import jwt from 'jsonwebtoken';
 
 import r from '../../db';
@@ -15,10 +12,11 @@ import {
     mutationWithClientCheck
 } from '../../utils/mutation';
 import {
+    hashAsync,
     compareAsync
 } from '../../utils/crypto';
 
-export default mutationWithClientMutationId({
+export default mutationWithClientCheck({
     name: 'EditPassword',
     description: 'Change the password for a user',
     inputFields: {
@@ -62,8 +60,8 @@ export default mutationWithClientMutationId({
         }
 
         userLoader.clear(user.id);
-        return r.table('users').get(id).then(user => ({
+        return {
             user
-        }));
+        };
     }
 });
