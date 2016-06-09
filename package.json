@@ -57,6 +57,7 @@
         "babel-polyfill": "^6.3.14",
         "bcrypt-nodejs": "0.0.3",
         "dataloader": "^1.0.0",
+        "datauri": "^1.0.4",
         "express-graphql": "^0.5.3",
         "graphql": "^0.6.0",
         "graphql-relay": "^0.4.2",
@@ -66,6 +67,8 @@
         "koa-bodyparser": "^3.0.0",
         "koa-morgan": "^1.0.1",
         "koa-router": "^7.0.1",
+        "mailgun": "^0.5.0",
+        "markdown-pdf": "^7.0.0",
         "node-dijkstra": "^2.2.1",
         "paypal-rest-sdk": "^1.6.8",
         "rethinkdbdash": "^2.3.6"
