@@ -118,6 +118,7 @@ const Viewer = new GraphQLObjectType({
                 return makePath(args.from, args.to)
                     .then(path => stationNameLoader.loadMany(path))
                     .then(stations => ({
+                        id: `${args.from}:${args.to}`
                         stations,
                         date: new Date(),
                         price: 100

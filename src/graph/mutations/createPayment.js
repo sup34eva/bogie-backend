@@ -16,10 +16,6 @@ export default mutationWithClientCheck({
     name: 'CreatePayment',
     description: `Create a PayPal payment intent`,
     inputFields: {
-        accessToken: {
-            type: new GraphQLNonNull(GraphQLString)
-        },
-
         returnUrl: {
             type: new GraphQLNonNull(GraphQLString)
         },

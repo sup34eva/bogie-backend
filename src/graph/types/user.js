@@ -23,13 +23,34 @@ export default new GraphQLObjectType({
         email: {
             type: GraphQLString
         },
+        type: {
+            type: new GraphQLEnumType({
+                name: 'UserType',
+                values: {
+                    EMAIL: {value: 0},
+                    FACEBOOK: {value: 1},
+                    GOOGLE: {value: 2}
+                }
+            }),
+            resolve(user, args) {
+                if (user.fbId) {
+                    return 1;
+                }
+
+                if (user.googleId) {
+                    return 2;
+                }
+
+                return 0;
+            }
+        }
         history: {
             type: require('../connections').trainConnection,
             args: connectionArgs,
-            resolve(line, args) {
-                if (line.history) {
+            resolve(user, args) {
+                if (user.history) {
                     return connectionFromPromisedArray(
-                        trainLoader.loadMany(line.history),
+                        trainLoader.loadMany(user.history),
                         args
                     );
                 }

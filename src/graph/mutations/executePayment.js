@@ -12,11 +12,18 @@ import {
 import {
     executePayment
 } from '../../utils/paypal';
+import {
+    makePDF
+} from '../../utils/pdf';
 
 export default mutationWithClientCheck({
     name: 'ExecutePayment',
     description: `Execute a PayPal payment`,
     inputFields: {
+        accessToken: {
+            type: GraphQLString
+        },
+
         payment: {
             type: new GraphQLNonNull(GraphQLID)
         },
@@ -25,17 +32,28 @@ export default mutationWithClientCheck({
         }
     },
     outputFields: {
-        payment: {
-            type: paymentType
+        receipt: {
+            type: GraphQLString
         }
     },
-    async mutateAndGetPayload({payment: paymentId, payer}) {
+    async mutateAndGetPayload({accessToken, payment: paymentId, payer}) {
         const payment = await executePayment(paymentId, {
             payer_id: payer
         });
 
+        if (accessToken) {
+            const {
+                sub: userId
+            } = jwt.verify(accessToken, process.env.TOKEN_SECRET);
+
+            const user = userLoader.load(userId);
+            const mail = await sendMail(user.email, 'Bogie', `
+                You got mail !
+            `);
+        }
+
         return {
-            payment
+            receipt: await makePDF(`Receipt`)
         };
     }
 });
