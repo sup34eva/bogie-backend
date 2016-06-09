@@ -3,8 +3,9 @@ import {
     GraphQLString,
     GraphQLID
 } from 'graphql';
+import jwt from 'jsonwebtoken';
 
-import paymentType from '../types/payment';
+import userLoader from '../../loaders/user';
 
 import {
     mutationWithClientCheck
@@ -15,6 +16,9 @@ import {
 import {
     makePDF
 } from '../../utils/pdf';
+import {
+    sendMail
+} from '../../utils/mail';
 
 export default mutationWithClientCheck({
     name: 'ExecutePayment',
@@ -37,7 +41,7 @@ export default mutationWithClientCheck({
         }
     },
     async mutateAndGetPayload({accessToken, payment: paymentId, payer}) {
-        const payment = await executePayment(paymentId, {
+        await executePayment(paymentId, {
             payer_id: payer
         });
 
@@ -47,7 +51,7 @@ export default mutationWithClientCheck({
             } = jwt.verify(accessToken, process.env.TOKEN_SECRET);
 
             const user = userLoader.load(userId);
-            const mail = await sendMail(user.email, 'Bogie', `
+            await sendMail(user.email, 'Bogie', `
                 You got mail !
             `);
         }

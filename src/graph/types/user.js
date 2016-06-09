@@ -1,5 +1,6 @@
 import {
     GraphQLObjectType,
+    GraphQLEnumType,
     GraphQLString
 } from 'graphql';
 import {
@@ -32,7 +33,7 @@ export default new GraphQLObjectType({
                     GOOGLE: {value: 2}
                 }
             }),
-            resolve(user, args) {
+            resolve(user) {
                 if (user.fbId) {
                     return 1;
                 }
@@ -43,7 +44,7 @@ export default new GraphQLObjectType({
 
                 return 0;
             }
-        }
+        },
         history: {
             type: require('../connections').trainConnection,
             args: connectionArgs,
